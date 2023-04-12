@@ -1,0 +1,11 @@
+eksa-admin-machine-trust-policy.json
+*.pub
+get-cluster-pub-cert.json
+update-cluster-config.json
+discovery.json
+amazon-eks-pod-identity-webhook/
+keys.json
+/*.yaml
+/*.json
+/*.bkp
+/worksheet.txt

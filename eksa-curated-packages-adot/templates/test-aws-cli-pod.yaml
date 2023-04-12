@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awscli
+spec:
+  serviceAccountName: pod-identity-webhook
+  containers:
+  - image: amazon/aws-cli
+    command:
+      - sleep
+      - "infinity"
+    name: awscli
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always

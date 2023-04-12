@@ -1,0 +1,12 @@
+{
+    "Parameters": {
+        "commands": [
+            "aws s3 cp s3://{{CLUSTER_CONFIG_S3_BUCKET}}/ /home/ssm-user --recursive --exclude \"*\" --include \"pod-identity-webhook-*\"",
+            "chown -R ssm-user:ssm-user /home/ssm-user/pod-identity-webhook-*.yaml",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; kubectl apply -f ./pod-identity-webhook-auth.yaml'",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; kubectl apply -f ./pod-identity-webhook-deployment.yaml'",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; kubectl apply -f ./pod-identity-webhook-mutatingwebhook.yaml'",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; kubectl apply -f ./pod-identity-webhook-service.yaml'"
+        ]
+    }
+}

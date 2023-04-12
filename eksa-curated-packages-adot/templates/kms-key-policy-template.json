@@ -1,0 +1,32 @@
+{
+    "Version": "2012-10-17",
+    "Id": "key-default-1",
+    "Statement": [
+        {
+            "Sid": "Enable IAM User Permissions",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::{{EKSA_ACCOUNT_ID}}:root"
+            },
+            "Action": "kms:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Allow use of the key",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::{{EKSA_ACCOUNT_ID}}:role/service-role/EKSAAdminMachineSSMServiceRole"
+            },
+            "Action": "kms:Decrypt",
+            "Resource": "*",
+            "Condition": {
+                "DateGreaterThan": {
+                    "aws:CurrentTime": "{{KMS_START_TIME}}"
+                },
+                "DateLessThan": {
+                    "aws:CurrentTime": "{{KMS_END_TIME}}"
+                }
+            }
+        }
+    ]
+}

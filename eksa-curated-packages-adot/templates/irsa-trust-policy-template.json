@@ -1,0 +1,17 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "{{OIDCPROVIDER}}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringLike": {
+                 "{{ISSUER_HOSTPATH}}:sub": ["system:serviceaccount:{{NAMESPACE}}:{{SERVICE_ACCOUNT}}"]
+                }
+               }
+        }
+    ]
+}

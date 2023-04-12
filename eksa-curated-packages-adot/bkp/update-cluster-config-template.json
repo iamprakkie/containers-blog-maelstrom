@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "commands": [
+            "su ssm-user -c 'cp ${HOME}/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.yaml ${HOME}/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.yaml.bkp'",
+            "awk '{print} /spec:/ && !n {print \"  podIamConfig:\\n    serviceAccountIssuer: https://{{ISSUER_HOSTPATH}}\"; n++}' /home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.yaml > /home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster-with-iampodconfig.yaml",
+            "chown -R ssm-user:ssm-user /home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster-with-iampodconfig.yaml",
+            "su ssm-user -c 'export EKSA_VSPHERE_USERNAME=$(sudo aws ssm get-parameter --region {{EKSA_CLUSTER_REGION}} --name /eksa/vsphere/username --with-decryption --query Parameter.Value --output text); export EKSA_VSPHERE_PASSWORD=$(sudo aws ssm get-parameter --region {{EKSA_CLUSTER_REGION}} --name /eksa/vsphere/password --with-decryption --query Parameter.Value --output text); cd /home/ssm-user; /usr/local/bin/eksctl anywhere -v9 upgrade cluster -f /home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster-with-iampodconfig.yaml 2>&1 | tee /home/ssm-user/{{EKSA_CLUSTER_NAME}}-cluster-upgrade.log'"
+        ]
+    }
+}

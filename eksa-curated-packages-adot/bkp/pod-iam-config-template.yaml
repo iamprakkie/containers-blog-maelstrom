@@ -1,0 +1,9 @@
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: Cluster
+metadata:
+  name: {{CONFIG_EKSA_CLUSTER_NAME}}
+spec:
+  podIamConfig:
+    serviceAccountIssuer: https://{{CONFIG_ISSUER_HOSTPATH}}
+
+---

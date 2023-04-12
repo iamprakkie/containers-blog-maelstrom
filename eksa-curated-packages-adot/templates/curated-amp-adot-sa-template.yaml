@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{SERVICEACCOUNT}}
+  namespace: {{NAMESPACE}}
+  annotations:
+    # set this with value of OIDC_IAM_ROLE     
+    eks.amazonaws.com/role-arn: {{ROLEARN}}
+    eks.amazonaws.com/audience: "sts.amazonaws.com"
+    # optional: When set to "true", adds AWS_STS_REGIONAL_ENDPOINTS env var to containers
+    eks.amazonaws.com/sts-regional-endpoints: "true"
+    # optional: Defaults to 86400 for expirationSeconds if not set
+    eks.amazonaws.com/token-expiration: "86400"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{SERVICEACCOUNT}}-cluster-role
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - nonResourceURLs:
+      - /metrics
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{SERVICEACCOUNT}}-cluster-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{SERVICEACCOUNT}}-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: {{SERVICEACCOUNT}}  
+    namespace: {{NAMESPACE}}

@@ -1,0 +1,9 @@
+{
+    "Parameters": {
+        "commands": [
+            "aws s3 cp s3://{{CLUSTER_CONFIG_S3_BUCKET}}/{{EKSA_CLUSTER_NAME}}-with-iampodconfig.yaml /home/ssm-user",
+            "chown -R ssm-user:ssm-user /home/ssm-user/{{EKSA_CLUSTER_NAME}}-with-iampodconfig.yaml",
+            "su ssm-user --shell bash -c 'export EKSA_VSPHERE_USERNAME=$(sudo aws ssm get-parameter --region {{EKSA_CLUSTER_REGION}} --name /eksa/vsphere/username --with-decryption --query Parameter.Value --output text); export EKSA_VSPHERE_PASSWORD=$(sudo aws ssm get-parameter --region {{EKSA_CLUSTER_REGION}} --name /eksa/vsphere/password --with-decryption --query Parameter.Value --output text); export EKSA_AWS_ACCESS_KEY_ID=$(sudo aws ssm get-parameter --region {{EKSA_CLUSTER_REGION}} --name /eksa/iam/ecr-akid --with-decryption --query Parameter.Value --output text); export EKSA_AWS_SECRET_ACCESS_KEY=$(sudo aws ssm get-parameter --region {{EKSA_CLUSTER_REGION}} --name /eksa/iam/ecr-sak --with-decryption --query Parameter.Value --output text); export EKSA_AWS_REGION={{EKSA_CLUSTER_REGION}}; cd /home/ssm-user; set -o pipefail; eksctl anywhere -v9 create cluster -f /home/ssm-user/{{EKSA_CLUSTER_NAME}}-with-iampodconfig.yaml --force-cleanup 2>&1 | tee /home/ssm-user/{{EKSA_CLUSTER_NAME}}-cluster-creation.log'"
+        ]
+    }
+}

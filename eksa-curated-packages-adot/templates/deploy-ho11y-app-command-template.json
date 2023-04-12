@@ -1,0 +1,9 @@
+{
+    "Parameters": {
+        "commands": [
+            "aws s3 cp s3://{{CLUSTER_CONFIG_S3_BUCKET}}/ho11y-app.yaml /home/ssm-user",
+            "chown -R ssm-user:ssm-user /home/ssm-user/ho11y-app.yaml",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; kubectl apply -f ./ho11y-app.yaml'"
+        ]
+    }
+}

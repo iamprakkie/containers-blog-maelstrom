@@ -1,0 +1,46 @@
+ apiVersion: packages.eks.amazonaws.com/v1alpha1
+ kind: Package
+ metadata:
+   name: curated-adot
+   namespace: eksa-packages-{{EKSA_CLUSTER_NAME}}
+ spec:
+   packageName: adot
+   targetNamespace: observability
+   config: | 
+     mode: deployment
+     replicaCount: 2
+     config:
+       receivers:
+         otlp:
+           protocols:
+             grpc:
+               endpoint: 0.0.0.0:4317
+             http:
+               endpoint: 0.0.0.0:4318
+         prometheus:
+           config:
+             scrape_configs:
+               - job_name: opentelemetry-collector
+                 scrape_interval: 10s
+                 static_configs:
+                   - targets:
+                       - ${MY_POD_IP}:8888
+       processors:
+         batch: {}
+         memory_limiter: null
+       exporters:
+         logging:
+           loglevel: debug
+       extensions:
+         health_check: {}
+         memory_ballast: {}
+       service:
+         pipelines:
+           metrics:
+             receivers: [otlp, prometheus]
+             processors: [batch, memory_limiter]
+             exporters: [logging]
+         telemetry:
+           metrics:
+             address: 0.0.0.0:8888
+

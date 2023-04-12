@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "EKSAConfigBucketRead",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": [
+                "arn:aws:s3:::{{CLUSTER_CONFIG_S3_BUCKET}}",
+                "arn:aws:s3:::{{CLUSTER_CONFIG_S3_BUCKET}}/*"
+            ],
+            "Condition": {
+                "DateGreaterThan": {
+                    "aws:CurrentTime": "{{BUCKET_START_TIME}}"
+                },
+                "DateLessThan": {
+                    "aws:CurrentTime": "{{BUCKET_END_TIME}}"
+                }
+            }            
+        }
+    ]
+}
