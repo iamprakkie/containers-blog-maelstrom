@@ -67,6 +67,11 @@ else
         fi
     fi
 
+    ####################aws s3api put-public-access-block --region ${EKSA_CLUSTER_REGION} \--bucket ${S3_BUCKET} --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+
+    ####################aws s3api put-bucket-ownership-controls --region ${EKSA_CLUSTER_REGION} --bucket ${S3_BUCKET} --ownership-controls="Rules=[{ObjectOwnership=BucketOwnerPreferred}]"
+
+
     #HOSTNAME=s3.${EKSA_CLUSTER_REGION}.amazonaws.com
     #ISSUER_HOSTPATH=${HOSTNAME}/${S3_BUCKET}
     ISSUER_HOSTPATH=${S3_BUCKET}.s3.${EKSA_CLUSTER_REGION}.amazonaws.com
@@ -76,6 +81,7 @@ else
 
     #upload discovery.json to s3 bucket as .well-known/openid-configuration
     ####################aws s3 cp --acl public-read ./discovery.json s3://${S3_BUCKET}/.well-known/openid-configuration
+    
 fi
 
 #Create IAM Identity provider for OpenID Connect

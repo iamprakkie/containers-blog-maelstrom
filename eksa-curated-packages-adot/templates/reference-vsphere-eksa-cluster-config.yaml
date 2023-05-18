@@ -15,7 +15,7 @@ spec:
   controlPlaneConfiguration:
     count: 2
     endpoint:
-      host: "10.4.4.72"
+      host: "XX.XX.XX.XX"
     machineGroupRef:
       kind: VSphereMachineConfig
       name: sample-cluster-cp

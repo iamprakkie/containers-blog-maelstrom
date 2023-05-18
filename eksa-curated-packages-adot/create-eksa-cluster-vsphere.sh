@@ -121,7 +121,7 @@ aws ssm list-command-invocations \
         --query "CommandInvocations[].CommandPlugins[].{Output:Output}" --output text
 
 if [ $ssmCommandStatus == "Failed" ]; then
-    echo -e "${R}Cluster creation FAILED. CCheck command output in Cloudwatch logs for more details.${NC}"
+    echo -e "${R}Cluster creation FAILED. Check command output in Cloudwatch logs for more details.${NC}"
     exit 1
 else 
     echo -e "${G}CLUSTER CREATION COMPLETE!!! Check command output in Cloudwatch logs for more details.${NC}"
