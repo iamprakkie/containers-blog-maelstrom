@@ -32,3 +32,5 @@ log 'O' "Deploying awscli pod for testing IRSA in namespace ${NAMESPACE}"
 kubectl_apply "awscli-irsa-test.yaml" "Deploying awscli pod for testing IRSA in namespace ${NAMESPACE}"
 
 rm -f awscli-irsa-test-permission-policy.json awscli-irsa-test.yaml
+
+log 'G' "Deployment of awscli pod for testing IRSA in namespace ${NAMESPACE} is COMPLETE!!!"
