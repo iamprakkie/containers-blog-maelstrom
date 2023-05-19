@@ -15,8 +15,8 @@ if [ ! -f ./${EKSA_CLUSTER_NAME}.yaml ]; then
     exit 1
 fi
 
-log 'O' "Creating OIDC Issuer for IRSA."
-sh ./ssm-user-to-docker-group.sh
+#configuring ssm-user and adding to docker group
+sh ./configure-ssm-user.sh
 
 log 'O' "Creating OIDC Issuer for IRSA."
 sh ./create-oidc-issuer.sh
