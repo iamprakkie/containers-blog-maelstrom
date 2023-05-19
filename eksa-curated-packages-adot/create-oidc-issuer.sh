@@ -16,6 +16,8 @@ if [ $serviceAccountIssuerCheck -gt 0 ]; then
     cp ./${EKSA_CLUSTER_NAME}.yaml ./${EKSA_CLUSTER_NAME}-with-iampodconfig.yaml
 
     S3_BUCKET=$(grep "serviceAccountIssuer:" ./${EKSA_CLUSTER_NAME}-with-iampodconfig.yaml | sed 's/^[[:space:]]*//g' | cut -d'/' -f3 | cut -d'.' -f1)
+    #HOSTNAME=s3.${EKSA_CLUSTER_REGION}.amazonaws.com
+    #ISSUER_HOSTPATH=${HOSTNAME}/${S3_BUCKET}
     ISSUER_HOSTPATH=${S3_BUCKET}.s3.${EKSA_CLUSTER_REGION}.amazonaws.com
 
 else    
@@ -24,7 +26,9 @@ else
 
     if [ ${existingBucket} != "None" ]; then
         S3_BUCKET=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/oidc/s3bucket --with-decryption --query Parameter.Value --output text)
-        log 'C' "Existing S3 bucket ${S3_BUCKET} found. Will proceed with OIDC issuer configured here for IRSA."
+        log 'C' "Existing S3 bucket ${S3_BUCKET} found. Will proceed with using this bucket for OIDC issuer for IRSA."
+        ISSUER_HOSTPATH=${S3_BUCKET}.s3.${EKSA_CLUSTER_REGION}.amazonaws.com
+
     else
         log 'R' "WARNING!!"
         read -p "This step will create S3 bucket with PUBLIC ACCESS to host well-known OpenID configuration and EKSA Cluster public signing key. Are you sure you want to proceed [Y/N]? " -n 2
@@ -41,6 +45,8 @@ else
         export S3_BUCKET=${S3_BUCKET:-oidc-sample-$(cat /dev/random 2>/dev/null | LC_ALL=C tr -dc "[:alpha:]" 2> /dev/null | tr '[:upper:]' '[:lower:]' 2>/dev/null | head -c 32)}
         ####################TEMP
         S3_BUCKET="oidc-sample-qxbklbapzdlntiwiitxiavnsraujyrdd-constant"
+        
+        ISSUER_HOSTPATH=${S3_BUCKET}.s3.${EKSA_CLUSTER_REGION}.amazonaws.com
 
         #create ssm parameters
         EKSA_KMS_KEY_ID=$(aws kms describe-key --region ${EKSA_CLUSTER_REGION} --key-id alias/eksa-ssm-params-key --query KeyMetadata.KeyId --output text)
@@ -68,10 +74,6 @@ else
 
         ####################aws s3api put-public-access-block --region ${EKSA_CLUSTER_REGION} --bucket ${S3_BUCKET} --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=true,RestrictPublicBuckets=true"
         ####################aws s3api put-bucket-ownership-controls --region ${EKSA_CLUSTER_REGION} --bucket ${S3_BUCKET} --ownership-controls="Rules=[{ObjectOwnership=BucketOwnerPreferred}]"
-
-        #HOSTNAME=s3.${EKSA_CLUSTER_REGION}.amazonaws.com
-        #ISSUER_HOSTPATH=${HOSTNAME}/${S3_BUCKET}
-        ISSUER_HOSTPATH=${S3_BUCKET}.s3.${EKSA_CLUSTER_REGION}.amazonaws.com
 
         #create OIDC discovery.json
         sed -e "s|{{ISSUER_HOSTPATH}}|${ISSUER_HOSTPATH}|g" templates/oidc-discovery-template.json > discovery.json
