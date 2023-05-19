@@ -74,5 +74,4 @@ create_irsa_role() {
     log 'G' "IRSA SETUP COMPLETE!!!"
 
     rm -f irsa-trust-policy.json irsa-sa.yaml create-irsa-sa-command.json
-
 }    

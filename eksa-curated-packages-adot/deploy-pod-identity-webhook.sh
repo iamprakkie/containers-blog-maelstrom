@@ -57,5 +57,4 @@ deploy_pod_identity_webhook() {
     log 'G' "Pod identity webhook deployment in namespace ${NAMESPACE} COMPLETE!!!"
 
     rm -f pod-identity-webhook-auth.yaml pod-identity-webhook-deployment.yaml pod-identity-webhook-mutatingwebhook.yaml pod-identity-webhook-service.yaml deploy-pod-identity-webhook-command.json
-
 }
