@@ -32,7 +32,7 @@ else
     #create ssm parameters
     EKSA_KMS_KEY_ID=$(aws kms describe-key --region ${EKSA_CLUSTER_REGION} --key-id alias/eksa-ssm-params-key --query KeyMetadata.KeyId --output text)
 
-    log 'O' "Creating SSM Secure Parameter /eksa/config/s3bucket in region ${EKSA_CLUSTER_REGION}."
+    log 'O' "Creating SSM SecureString /eksa/config/s3bucket in region ${EKSA_CLUSTER_REGION}."
     aws ssm put-parameter --region ${EKSA_CLUSTER_REGION} \
         --name /eksa/config/s3bucket \
         --type "SecureString" \

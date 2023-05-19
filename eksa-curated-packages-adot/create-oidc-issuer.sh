@@ -51,7 +51,7 @@ else
         #create ssm parameters
         EKSA_KMS_KEY_ID=$(aws kms describe-key --region ${EKSA_CLUSTER_REGION} --key-id alias/eksa-ssm-params-key --query KeyMetadata.KeyId --output text)
 
-        log 'O' "Creating SSM Secure Parameter /eksa/oidc/s3bucket in region ${EKSA_CLUSTER_REGION}."
+        log 'O' "Creating SSM SecureString /eksa/oidc/s3bucket in region ${EKSA_CLUSTER_REGION}."
         aws ssm put-parameter --region ${EKSA_CLUSTER_REGION} \
             --name /eksa/oidc/s3bucket \
             --type "SecureString" \
@@ -161,4 +161,4 @@ aws ssm put-parameter --region ${EKSA_CLUSTER_REGION} \
 log 'G' "\nSuccessfully completed following tasks: "
 log 'G' "\tCreated IAM Identity provider for OpenID Connect URL (issuer): ${ISSUER_HOSTPATH}."
 log 'G' "\tCreated cluster config file ./${EKSA_CLUSTER_NAME}-with-iampodconfig.yaml with podIamConfig."
-log 'G' "\tCreated/Updated SSM Secure Parameters /eksa/oidc/s3bucket, /eksa/oidc/issuer and /eksa/oidc/provider in region ${EKSA_CLUSTER_REGION}.\n"
+log 'G' "\tCreated/Updated SSM SecureStrings /eksa/oidc/s3bucket, /eksa/oidc/issuer and /eksa/oidc/provider in region ${EKSA_CLUSTER_REGION}.\n"

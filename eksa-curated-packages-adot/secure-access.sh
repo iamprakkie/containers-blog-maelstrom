@@ -45,7 +45,7 @@ rm kms-key-policy.json
 vSphereSSMParamCheck=$(aws ssm describe-parameters --region ${EKSA_CLUSTER_REGION} --parameter-filters Key=Name,Option=Equals,Values=/eksa/vsphere/username,/eksa/vsphere/password --query 'length(Parameters[*].Name)')
 
 if [ $vSphereSSMParamCheck == 2 ]; then
-    log 'C' "Existing SSM Secure Parameters /eksa/vsphere/username and /eksa/vsphere/password found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."
+    log 'C' "Existing SSM SecureStrings /eksa/vsphere/username and /eksa/vsphere/password found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."
 else
     #get vSphere credentials
     echo -ne "vSphere Username: "
@@ -69,7 +69,7 @@ else
         --value ${vSpherePassword} \
         --overwrite   
 
-    log 'G' "Created SSM Secure Parameters /eksa/vsphere/username and /eksa/vsphere/password in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}." 
+    log 'G' "Created SSM SecureStrings /eksa/vsphere/username and /eksa/vsphere/password in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}." 
 fi
 
 #checking for existing IAM user for read access to EKSA ECR for curated packages.
@@ -103,7 +103,7 @@ fi
 accessKeySSMParamCheck=$(aws ssm describe-parameters --region ${EKSA_CLUSTER_REGION} --parameter-filters Key=Name,Option=Equals,Values=/eksa/iam/ecr-akid,/eksa/iam/ecr-sak --query 'length(Parameters[*].Name)')
 
 if [ $accessKeySSMParamCheck == 2 ]; then
-    log 'C' "Existing SSM Secure Parameters /eksa/iam/ecr-akid and /eksa/iam/ecr-sak found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."    
+    log 'C' "Existing SSM SecureStrings /eksa/iam/ecr-akid and /eksa/iam/ecr-sak found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."    
 else
     #Generate AKID and Secret
     log 'O' "Creating Access Key ID and Secret Access Key for IAM User EKSACuratedPackagesAccessUser."    
@@ -126,7 +126,7 @@ else
         --value ${accessKeyCredArr[1]} \
         --overwrite    
     
-    log 'G' "Created SSM Secure Parameters /eksa/iam/ecr-akid and /eksa/iam/ecr-sak in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."         
+    log 'G' "Created SSM SecureStrings /eksa/iam/ecr-akid and /eksa/iam/ecr-sak in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."         
 fi
 
 
