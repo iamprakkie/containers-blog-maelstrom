@@ -26,7 +26,7 @@ create_irsa_role "${NAMESPACE}" "${SERVICEACCOUNT}" "awscli-irsa-test-permission
 
 #You can bring your own manifest file here.
 log 'O' "Deploying awscli pod for testing IRSA in namespace ${NAMESPACE}"
-sed -e "s|{{NAMESPACE}}|${NAMESPACE}|g; s|{{SERVICEACCOUNT}}|${SERVICEACCOUNT}|g" awscli-irsa-test-template.yaml > awscli-irsa-test.yaml
+sed -e "s|{{NAMESPACE}}|${NAMESPACE}|g; s|{{SERVICEACCOUNT}}|${SERVICEACCOUNT}|g" templates/awscli-irsa-test-template.yaml > awscli-irsa-test.yaml
 
 log 'O' "Deploying awscli pod for testing IRSA in namespace ${NAMESPACE}"
 kubectl_apply "awscli-irsa-test.yaml" "Deploying awscli pod for testing IRSA in namespace ${NAMESPACE}"
