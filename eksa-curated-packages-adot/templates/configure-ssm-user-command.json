@@ -1,7 +1,7 @@
 {
     "Parameters": {
         "commands": [
-            "userCheck=$(grep -c eksa /etc/passwd); if [ $userCheck -eq 0 ]; then adduser -U -m ssm-user; echo \"# User rules for ssm-user\" >> /etc/sudoers.d/ssm-agent-users; chmod 440 /etc/sudoers.d/ssm-agent-users; mkdir -p /home/ssm-user/.ssh; chmod 700 /home/ssm-user/.ssh; chown -R ssm-user:ssm-user /home/ssm-user",
+            "userCheck=$(grep -c eksa /etc/passwd); if [ $userCheck -eq 0 ]; then adduser -U -m ssm-user; echo \"# User rules for ssm-user\" >> /etc/sudoers.d/ssm-agent-users; chmod 440 /etc/sudoers.d/ssm-agent-users; mkdir -p /home/ssm-user/.ssh; chmod 700 /home/ssm-user/.ssh; chown -R ssm-user:ssm-user /home/ssm-user fi",
             "usermod -a -G docker ssm-user"
         ]
     }

@@ -27,7 +27,7 @@ ssm-send-command() {
         --cli-input-json file://${CMD_FILE} \
         --cloud-watch-output-config "CloudWatchOutputEnabled=true,CloudWatchLogGroupName=/eksa/ssm/send-command/cluster-creation" \
         --output text --query "Command.CommandId")
-    echo "\n"
+
     log 'O' "SSM Command ID: ${ssmCommandId}"
     ssmCommandStatus="None"
     until [ $ssmCommandStatus == "Success" ] || [ $ssmCommandStatus == "Failed" ]; do
