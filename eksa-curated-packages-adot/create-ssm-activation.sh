@@ -53,7 +53,7 @@ else
 
     # wait till role gets created
     roleCount=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")
-    while $roleCount -eq 0; do
+    while [ $roleCount -eq 0 ]; do
         sleep 5s # Waits 5 seconds
         roleCount=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")
         log 'O' "Waiting for role to get created"
