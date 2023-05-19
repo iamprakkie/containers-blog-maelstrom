@@ -24,7 +24,7 @@ sed -e "s|{{EKSA_ACCOUNT_ID}}|${EKSA_ACCOUNT_ID}|g; s|{{KMS_START_TIME}}|${kmsSt
 #checking for existing KMS key with same alias
 existingAlias=$(aws kms list-aliases  --region ${EKSA_CLUSTER_REGION} --query "Aliases[?AliasName=='alias/eksa-ssm-params-key'].AliasName" --output text)
 if [ ! -z ${existingAlias} ]; then
-    echo -e "${Y}KMS key with alias "${existingAlias}" found in region ${EKSA_CLUSTER_REGION}. Will use this KMS Key with updated validity.${NC}"
+    log 'C' "KMS key with alias "${existingAlias}" found in region ${EKSA_CLUSTER_REGION}. Will use this KMS Key with updated validity."
     EKSA_KMS_KEY_ID=$(aws kms describe-key --region ${EKSA_CLUSTER_REGION} --key-id alias/eksa-ssm-params-key --query KeyMetadata.KeyId --output text)
 else
     #create kms key
@@ -36,7 +36,7 @@ fi
 aws kms put-key-policy --region ${EKSA_CLUSTER_REGION} --policy-name default --key-id ${EKSA_KMS_KEY_ID} --policy file://kms-key-policy.json
 #aws kms get-key-policy --region ${EKSA_CLUSTER_REGION} --policy-name default --key-id ${EKSA_KMS_KEY_ID} --output text
 
-echo -e "${G}Created/Updated KMS Key ${EKSA_KMS_KEY_ID} with alias alias/eksa-ssm-params-key and validity from ${kmsStartDateLocal} till ${kmsEndDateLocal}.${NC}"
+log 'G' "Created/Updated KMS Key ${EKSA_KMS_KEY_ID} with alias alias/eksa-ssm-params-key and validity from ${kmsStartDateLocal} till ${kmsEndDateLocal}."
 
 #deleting permission policy file
 rm kms-key-policy.json
@@ -45,12 +45,12 @@ rm kms-key-policy.json
 vSphereSSMParamCheck=$(aws ssm describe-parameters --region ${EKSA_CLUSTER_REGION} --parameter-filters Key=Name,Option=Equals,Values=/eksa/vsphere/username,/eksa/vsphere/password --query 'length(Parameters[*].Name)')
 
 if [ $vSphereSSMParamCheck == 2 ]; then
-    echo -e "${G}Existing SSM Secure Parameters /eksa/vsphere/username and /eksa/vsphere/password found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}.${NC}"    
+    log 'C' "Existing SSM Secure Parameters /eksa/vsphere/username and /eksa/vsphere/password found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."
 else
     #get vSphere credentials
-    echo -ne "${Y}vSphere Username: ${NC}"
+    echo -ne "vSphere Username: "
     read vSphereUsername
-    echo -ne "${Y}vSphere Password: ${NC}"
+    echo -ne "vSphere Password: "
     read -s vSpherePassword
     echo
 
@@ -69,7 +69,7 @@ else
         --value ${vSpherePassword} \
         --overwrite   
 
-    echo -e "${G}Created SSM Secure Parameters /eksa/vsphere/username and /eksa/vsphere/password in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}. ${NC}"         
+    log 'G' "Created SSM Secure Parameters /eksa/vsphere/username and /eksa/vsphere/password in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}." 
 fi
 
 #checking for existing IAM user for read access to EKSA ECR for curated packages.
@@ -82,15 +82,15 @@ if [ ! -z ${existingIAMUser} ]; then
     attachedUserPolicy=$(aws iam list-user-policies --user-name EKSACuratedPackagesAccessUser --query PolicyNames --output text)
 
     if [ ${attachedPoliciesCount} == 0 ] && [ ${attachedUserPoliciesCount} == 1 ]  && [ ${attachedUserPolicy} == 'EKSACuratedPackagesAccessPolicy' ]; then
-        echo -e "${Y}Existing IAM User with name "${existingIAMUser}" found. Will use this IAM user to create access key for read access to EKSA ECR for curated packages.${NC}"
+        log 'O' "Existing IAM User with name "${existingIAMUser}" found. Will use this IAM user to create access key for read access to EKSA ECR for curated packages."
     else
-        echo -e "${R}Existing IAM User with name "${existingIAMUser}" found with unexpected policies. Fix the policies or delete this IAM user to proceed.${NC}"
+        log 'R' "Existing IAM User with name "${existingIAMUser}" found with unexpected policies. Fix the policies or delete this IAM user to proceed."
         exit 1
     fi
 
 else
     #create IAM user to generate AKID and Secret access key
-    echo -e "${Y}Creating IAM User EKSACuratedPackagesAccessUser with read access to EKSA ECR for curated packages.${NC}"    
+    log 'O' "Creating IAM User EKSACuratedPackagesAccessUser with read access to EKSA ECR for curated packages."
     aws iam create-user --user-name EKSACuratedPackagesAccessUser
 
     #attach inline policy 
@@ -103,10 +103,10 @@ fi
 accessKeySSMParamCheck=$(aws ssm describe-parameters --region ${EKSA_CLUSTER_REGION} --parameter-filters Key=Name,Option=Equals,Values=/eksa/iam/ecr-akid,/eksa/iam/ecr-sak --query 'length(Parameters[*].Name)')
 
 if [ $accessKeySSMParamCheck == 2 ]; then
-    echo -e "${G}Existing SSM Secure Parameters /eksa/iam/ecr-akid and /eksa/iam/ecr-sak found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}.${NC}"    
+    log 'C' "Existing SSM Secure Parameters /eksa/iam/ecr-akid and /eksa/iam/ecr-sak found in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."    
 else
     #Generate AKID and Secret
-    echo -e "${Y}Creating Access Key ID and Secret Access Key for IAM User EKSACuratedPackagesAccessUser.${NC}"    
+    log 'O' "Creating Access Key ID and Secret Access Key for IAM User EKSACuratedPackagesAccessUser."    
     accessKeyCred=$(aws iam create-access-key --user-name EKSACuratedPackagesAccessUser --query '{AKID:AccessKey.AccessKeyId,SAK:AccessKey.SecretAccessKey}' --output text)
 
     accessKeyCredArr=($accessKeyCred)
@@ -126,7 +126,7 @@ else
         --value ${accessKeyCredArr[1]} \
         --overwrite    
     
-    echo -e "${G}Created SSM Secure Parameters /eksa/iam/ecr-akid and /eksa/iam/ecr-sak in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}. ${NC}"         
+    log 'G' "Created SSM Secure Parameters /eksa/iam/ecr-akid and /eksa/iam/ecr-sak in region ${EKSA_CLUSTER_REGION}. You can use these SSM Secure Parmaters within validity period from ${kmsStartDateLocal} and ${kmsEndDateLocal}."         
 fi
 
 
@@ -154,6 +154,6 @@ if [ ! -z ${existingRole} ]; then
             --policy-name EKSACluserConfigAccessPolicy \
             --policy-document file://config-bucket-access-policy.json
 
-        echo -e "${G}Updated EKSACluserConfigAccessPolicy validity in EKSAAdminMachineSSMServiceRole. You can use this policy within validity period from ${bucketStartDateLocal} and ${bucketEndDateLocal}. ${NC}"
+        log 'G' "Updated EKSACluserConfigAccessPolicy validity in EKSAAdminMachineSSMServiceRole. You can use this policy within validity period from ${bucketStartDateLocal} and ${bucketEndDateLocal}."
     fi
 fi
