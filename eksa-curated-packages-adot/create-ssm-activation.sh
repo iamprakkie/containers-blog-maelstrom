@@ -1,43 +1,33 @@
 #!/bin/bash
-NC='\033[0m'       # Text Reset
-R='\033[0;31m'          # Red
-G='\033[0;32m'        # Green
-Y='\033[0;33m'       # Yellow
-echo -e "${Y}"
+
+source ./format_display.sh
 
 # exit when any command fails
 set -e
 
 # checking environment variables
-if [ -z "${EKSA_ACCOUNT_ID}" ]; then
-    echo -e "${R}env variable EKSA_ACCOUNT_ID not set.${NC}"; exit 1
-fi
-
-if [ -z "${EKSA_CLUSTER_REGION}" ]; then
-    echo -e "${R}env variable EKSA_CLUSTER_REGION not set.${NC}"; exit 1
-fi
+source ./format_display.sh
+env_vars_check
 
 #Enabling Advanced Managed Instance Activation Tier. This is required to use Session Manager with your on-premises instances
 managedInstanceActivationTier=$(aws ssm get-service-setting --region ${EKSA_CLUSTER_REGION} --setting-id /ssm/managed-instance/activation-tier --query ServiceSetting.SettingValue --output text)
 
 if [ $managedInstanceActivationTier != "advanced" ]; then
     echo -e "\n"
-    echo -e "${Y}Enabling advanced-instances tier to use Session Manager with your on-premises instances.${NC}\n"
-    aws ssm update-service-setting \
-    --region ${EKSA_CLUSTER_REGION} --setting-id /ssm/managed-instance/activation-tier \
-    --setting-value advanced
+    log 'O' "Enabling advanced-instances tier to use Session Manager with your on-premises instances.\n"
+    aws ssm update-service-setting --region ${EKSA_CLUSTER_REGION} --setting-id /ssm/managed-instance/activation-tier --setting-value advanced
 fi
 
 #checking for existing IAM Role for EKSA Admin machine
 existingRole=$(aws iam list-roles --query "Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'].RoleName" --output text)
 if [ ! -z ${existingRole} ]; then
-    echo -e "${Y}Existing IAM role with name ${existingRole} found. Will use this IAM role for EKSA Admin machine.${NC}"
+    log 'O' "Existing IAM role with name ${existingRole} found. Will use this IAM role for EKSA Admin machine."
 else
     #create trust policy
     sed -e "s|{{EKSA_ACCOUNT_ID}}|${EKSA_ACCOUNT_ID}|g; s|{{EKSA_CLUSTER_REGION}}|${EKSA_CLUSTER_REGION}|g" templates/eksa-admin-machine-trust-policy-template.json > eksa-admin-machine-trust-policy.json
 
     #create role with trust policy
-    echo -e "${Y}Creating IAM role for EKSA Admin machine: ${NC}"
+    log 'O' "Creating IAM role for EKSA Admin machine: "
     aws iam create-role \
         --path /service-role/ \
         --role-name EKSAAdminMachineSSMServiceRole \
@@ -80,4 +70,4 @@ aws ssm create-activation \
   --tags "Key=Environment,Value=EKSA" "Key=MachineType,Value=Admin" \
   --output table
 
-echo -e "${G}Above mentioned Activation Code and Activation ID will expire on ${expirationDateLocal}.${NC}"
+log 'G' "Above mentioned Activation Code and Activation ID will expire on ${expirationDateLocal}."
