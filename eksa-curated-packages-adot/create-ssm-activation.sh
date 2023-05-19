@@ -6,7 +6,7 @@ source ./format_display.sh
 set -e
 
 # checking environment variables
-source ./format_display.sh
+source ./env-vars-check.sh
 env_vars_check
 
 #Enabling Advanced Managed Instance Activation Tier. This is required to use Session Manager with your on-premises instances
