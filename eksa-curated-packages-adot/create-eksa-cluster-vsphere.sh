@@ -9,6 +9,9 @@ set -e
 source ./env-vars-check.sh
 env_vars_check
 
+# to send commands through ssm
+source ./ssm-send-command.sh
+
 #creating EKSA Cluster
 if [ ! -f ./${EKSA_CLUSTER_NAME}.yaml ]; then
     log 'R' "${EKSA_CLUSTER_NAME}.yaml not found in current location ($PWD)."

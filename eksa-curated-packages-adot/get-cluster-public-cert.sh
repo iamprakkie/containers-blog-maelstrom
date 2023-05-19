@@ -9,6 +9,9 @@ set -e
 source ./env-vars-check.sh
 env_vars_check
 
+# to send commands through ssm
+source ./ssm-send-command.sh
+
 #running ssm command to get public cert of EKSA cluster
 sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g" templates/get-cluster-pub-cert-command-template.json > get-cluster-pub-cert-command.json
 
