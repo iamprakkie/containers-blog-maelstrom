@@ -31,7 +31,7 @@ source ./ssm-send-command.sh
 
 MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
 
-ssm-send-command ${MI_ADMIN_MACHINE} "templates/check-for-ssm-user-command.json" "Configure SSM user and add to docker group"
+ssm-send-command ${MI_ADMIN_MACHINE} "templates/configure-ssm-user-command.json" "Configure SSM user and add to docker group"
 
 # #running ssm command
 # ssmCommandId=$(aws ssm send-command \
