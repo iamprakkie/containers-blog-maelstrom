@@ -49,15 +49,23 @@ else
 
     #get role and policy
     #aws iam get-role --role-name EKSAAdminMachineSSMServiceRole
-    #aws iam get-role-policy --role-name EKSAAdminMachineSSMServiceRole --policy-name EKSACuratedPackagesAccessPolicy
+    #aws iam get-role-policy --role-name EKSAAdminMachineSSMServiceRole --policy-name AmazonSSMManagedInstanceCore
+    #aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])"
 
     # wait till role gets created
-    roleCount=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")
-    while [ $roleCount -eq 0 ]; do
+    roleCheck=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")
+    while [ $roleCheck -eq 0 ]; do
         log 'O' "Waiting for role to get created"
         sleep 5s # Waits 5 seconds
-        roleCount=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")        
+        roleCheck=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")        
     done
+    rolePolicyCheck=$(aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])")
+    while [ $rolePolicyCheck -eq 0 ]; do
+        log 'O' "Waiting for role policy AmazonSSMManagedInstanceCore to get attached"
+        sleep 5s # Waits 5 seconds
+        rolePolicyCheck=$(aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])")
+    done
+
 fi
 
 expirationDate=$(date -u -d '+2 hour' '+%F %T')
