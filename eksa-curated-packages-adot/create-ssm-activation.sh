@@ -52,18 +52,24 @@ else
     #aws iam get-role-policy --role-name EKSAAdminMachineSSMServiceRole --policy-name AmazonSSMManagedInstanceCore
     #aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])"
 
-    # wait till role gets created
-    roleCheck=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")
-    while [ $roleCheck -eq 0 ]; do
-        log 'O' "Waiting for role to get created"
-        sleep 5s # Waits 5 seconds
-        roleCheck=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")        
-    done
-    rolePolicyCheck=$(aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])")
-    while [ $rolePolicyCheck -eq 0 ]; do
+    # wait till role gets created and SSM trust principal is created
+    # roleCheck=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")
+    # while [ $roleCheck -eq 0 ]; do
+    #     log 'O' "Waiting for role to get created"
+    #     sleep 5s # Waits 5 seconds
+    #     roleCheck=$(aws iam list-roles --query "length(Roles[?RoleName=='EKSAAdminMachineSSMServiceRole'])")        
+    # done
+    # rolePolicyCheck=$(aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])")
+    # while [ $rolePolicyCheck -eq 0 ]; do
+    #     log 'O' "Waiting for role policy AmazonSSMManagedInstanceCore to get attached"
+    #     sleep 5s # Waits 5 seconds
+    #     rolePolicyCheck=$(aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])")
+    # done
+    trustPolicyCheck=$(aws iam get-role --role-name EKSAAdminMachineSSMServiceRole --query "Role.AssumeRolePolicyDocument.Statement[].Principal[].Service")
+    while [ $trustPolicyCheck != "ssm.amazonaws.com" ]; do
         log 'O' "Waiting for role policy AmazonSSMManagedInstanceCore to get attached"
         sleep 5s # Waits 5 seconds
-        rolePolicyCheck=$(aws iam list-attached-role-policies --role-name EKSAAdminMachineSSMServiceRole --query "length(AttachedPolicies[?PolicyArn=='arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'])")
+        trustPolicyCheck=$(aws iam get-role --role-name EKSAAdminMachineSSMServiceRole --query "Role.AssumeRolePolicyDocument.Statement[].Principal[].Service")
     done
 
 fi
