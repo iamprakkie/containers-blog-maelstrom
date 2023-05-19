@@ -12,7 +12,7 @@ env_vars_check
 # to send commands through ssm
 source ./ssm-send-command.sh
 
-deploy-pod-identity-webhook() {
+deploy_pod_identity_webhook() {
     if [[ $# -ne 1 ]]; then
         log 'R' "Usage: deploy-pod-identity-webhook <NAMESPACE>"
         exit 1
@@ -50,7 +50,7 @@ deploy-pod-identity-webhook() {
     sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g; s|{{EKSA_CLUSTER_REGION}}|${EKSA_CLUSTER_REGION}|g" templates/deploy-pod-identity-webhook-command-template.json > deploy-pod-identity-webhook-command.json
 
     # deploy pod identity webhook
-    log 'O' "Deploying pod identity webhook in namespace ${namespace} with IAM role AMP-ADOT-IRSA-Role for IRSA."
+    log 'O' "Deploying pod identity webhook in namespace ${NAMESPACE}."
     MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
     ssm-send-command ${MI_ADMIN_MACHINE} "deploy-pod-identity-webhook-command.json" "Download pod identity webhook manifest files and deploy"
 

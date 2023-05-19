@@ -54,7 +54,7 @@ create_irsa_role() {
 
     #
     log 'O' "Deploying pod-identity-webhook in namespace ${NAMESPACE}..."
-    deploy-pod-identity-webhook ${NAMESPACE}
+    deploy_pod_identity_webhook ${NAMESPACE}
 
     #prepare sa yaml
     sed -e "s|{{NAMESPACE}}|${NAMESPACE}|g; s|{{SERVICEACCOUNT}}|${SERVICEACCOUNT}|g; s|{{ROLEARN}}|${ROLEARN}|g" templates/irsa-sa-template.yaml > irsa-sa.yaml
