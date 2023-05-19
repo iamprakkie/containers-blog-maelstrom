@@ -38,8 +38,8 @@ S3_BUCKET=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /e
 log 'O' "Uploading keys.json to ${S3_BUCKET}."
 #upload get-cluster-pub-cert.json to s3 bucket as .well-known/openid-configuration
 ####################aws s3 cp --acl public-read ./keys.json s3://${S3_BUCKET}/keys.json
-echo "will upload keys.json to s3 bucket ${S3_BUCKET}"
+echo "Temporary:: Manually upload keys.json to s3 bucket ${S3_BUCKET}"
 
-#rm ../${EKSA_CLUSTER_NAME}-sa.pub ../keys.json
+rm ../${EKSA_CLUSTER_NAME}-sa.pub ../keys.json
 
 log 'G' "PUBLIC CERT UPLOADED TO OIDC ISSUER!!!"
