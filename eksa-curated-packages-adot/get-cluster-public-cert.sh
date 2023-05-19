@@ -22,7 +22,7 @@ MI_ADMIN_MACHINE=$(aws ssm --region $EKSA_CLUSTER_REGION describe-instance-infor
 ssm-send-command ${MI_ADMIN_MACHINE} "get-cluster-pub-cert-command.json" "Get cluster public cert"
 
 #downloading pub file from config s3 bucket
-aws s3 cp s3://${CLUSTER_CONFIG_S3_BUCKET}/${EKSA_CLUSTER_NAME}-sa.pub /home/ssm-user/${EKSA_CLUSTER_NAME}-sa.pub
+aws s3 cp s3://${CLUSTER_CONFIG_S3_BUCKET}/${EKSA_CLUSTER_NAME}-sa.pub ./${EKSA_CLUSTER_NAME}-sa.pub
 
 log 'O' "Creating keys.json from public certificate."
 rm -fr amazon-eks-pod-identity-webhook
