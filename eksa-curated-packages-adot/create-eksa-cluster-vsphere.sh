@@ -84,47 +84,20 @@ aws iam put-role-policy \
     --policy-name EKSACluserConfigAccessPolicy \
     --policy-document file://config-bucket-access-policy.json
 
-#download cluster config in ADMIN MACHINE and initate cluster creation
-log 'O' "\nDownloading cluster config file in ADMIN MACHINE and initiating cluster creation."
-MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
+rm ./config-bucket-access-policy.json
 
-#create config-bucket-access-policy.json
+#create create-eksa-cluster-command.json
 sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g; s|{{EKSA_CLUSTER_REGION}}|${EKSA_CLUSTER_REGION}|g" templates/create-eksa-cluster-command-template.json > create-eksa-cluster-command.json
 
-ssmCommandId=$(aws ssm send-command \
-    --region ${EKSA_CLUSTER_REGION} \
-    --instance-ids ${MI_ADMIN_MACHINE} \
-    --document-name "AWS-RunShellScript" \
-    --comment "Download cluster config to ADMIN MACHINE and create EKSA cluster" \
-    --cli-input-json file://create-eksa-cluster-command.json \
-    --cloud-watch-output-config "CloudWatchOutputEnabled=true,CloudWatchLogGroupName=/eksa/ssm/send-command/cluster-creation" \
-    --output text --query "Command.CommandId")
-echo -e "\nSSM Command ID: ${ssmCommandId}"
-ssmCommandStatus="None"
-until [ $ssmCommandStatus == "Success" ] || [ $ssmCommandStatus == "Failed" ]; do
-    ssmCommandStatus=$(aws ssm list-command-invocations \
-        --command-id "${ssmCommandId}" \
-        --region ${EKSA_CLUSTER_REGION} \
-        --details \
-        --query "CommandInvocations[].CommandPlugins[].{Status:Status}" --output text)
-    echo $ssmCommandStatus        
-    sleep 3s # Waits 3 seconds
-done
+#download cluster config in ADMIN MACHINE and initate cluster creation
+MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
 
-log 'O' "\nSSM Command Ouput: "
+log 'O' "Downloading cluster config file in ADMIN MACHINE and initiating cluster creation."
+ssm-send-command ${MI_ADMIN_MACHINE} "create-eksa-cluster-command.json" "Download cluster config to ADMIN MACHINE and create EKSA cluster"
 
-aws ssm list-command-invocations \
-        --command-id "${ssmCommandId}" \
-        --region ${EKSA_CLUSTER_REGION} \
-        --details \
-        --query "CommandInvocations[].CommandPlugins[].{Output:Output}" --output text
+log 'G' "CLUSTER CREATION COMPLETE!!!"
 
-if [ $ssmCommandStatus == "Failed" ]; then
-    log 'R' "Cluster creation FAILED. Check command output in Cloudwatch logs for more details."
-    exit 1
-else 
-    log 'G' "CLUSTER CREATION COMPLETE!!! Check command output in Cloudwatch logs for more details."
-fi
+rm create-eksa-cluster-command.json
 
 #get get public cert of EKSA cluster
 sh ./get-cluster-public-cert.sh
