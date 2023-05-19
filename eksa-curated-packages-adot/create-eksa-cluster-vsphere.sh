@@ -1,25 +1,24 @@
 #!/bin/bash
 
-NC='\033[0m'       # Text Reset
-R='\033[0;31m'          # Red
-G='\033[0;32m'        # Green
-Y='\033[0;33m'       # Yellow
+source ./format_display.sh
 
 # exit when any command fails
 set -e
 
-#checking for required OS env variables
+# checking environment variables
 source ./env-vars-check.sh
 env_vars_check
-echo -e "${Y}"
 
 #creating EKSA Cluster
 if [ ! -f ./${EKSA_CLUSTER_NAME}.yaml ]; then
-    echo -e "${R}${EKSA_CLUSTER_NAME}.yaml not found in current location ($PWD).${NC}"
+    log 'R' "${EKSA_CLUSTER_NAME}.yaml not found in current location ($PWD)."
     exit 1
 fi
 
-echo -e "${Y}Creating OIDC Issuer for IRSA.${NC}"
+log 'O' "Creating OIDC Issuer for IRSA."
+sh ./ssm-user-to-docker-group.sh
+
+log 'O' "Creating OIDC Issuer for IRSA."
 sh ./create-oidc-issuer.sh
 
 existingConfigBucket=$(sudo aws ssm get-parameters --region ${EKSA_CLUSTER_REGION} --name /eksa/config/s3bucket --query Parameters[0].Name --output text)
@@ -33,7 +32,7 @@ else
     #create ssm parameters
     EKSA_KMS_KEY_ID=$(aws kms describe-key --region ${EKSA_CLUSTER_REGION} --key-id alias/eksa-ssm-params-key --query KeyMetadata.KeyId --output text)
 
-    echo -e "${Y}Creating SSM Secure Parameter /eksa/config/s3bucket in region ${EKSA_CLUSTER_REGION}.${NC}"
+    log 'O' "Creating SSM Secure Parameter /eksa/config/s3bucket in region ${EKSA_CLUSTER_REGION}."
     aws ssm put-parameter --region ${EKSA_CLUSTER_REGION} \
         --name /eksa/config/s3bucket \
         --type "SecureString" \
@@ -43,7 +42,7 @@ else
 fi
 
 # Create the bucket if it doesn't exist
-echo -e "${Y}Creating/Using S3 bucket ${CLUSTER_CONFIG_S3_BUCKET} for storing cluster config files.${NC}"
+log 'O' "Creating/Using S3 bucket ${CLUSTER_CONFIG_S3_BUCKET} for storing cluster config files."
 _bucket_name=$(aws s3api list-buckets  --query "Buckets[?Name=='${CLUSTER_CONFIG_S3_BUCKET}'].Name | [0]" --out text)
 if [ $_bucket_name == "None" ]; then
     if [ "${EKSA_CLUSTER_REGION}" == "us-east-1" ]; then
@@ -57,14 +56,14 @@ if [ $_bucket_name == "None" ]; then
 fi
 
 #blocking public access for S3 bucket
-echo -e "${Y}Blocking public access for S3 bucket ${CLUSTER_CONFIG_S3_BUCKET}.${NC}"
+log 'O' "Blocking public access for S3 bucket ${CLUSTER_CONFIG_S3_BUCKET}."
 aws s3api put-public-access-block \
 --region ${EKSA_CLUSTER_REGION} \
 --bucket ${CLUSTER_CONFIG_S3_BUCKET} \
 --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 
 #upload files to config bucket
-echo -e "${Y}Uploading ./${EKSA_CLUSTER_NAME}-with-iampodconfig.yaml to ${CLUSTER_CONFIG_S3_BUCKET}.${NC}"
+log 'O' "Uploading ./${EKSA_CLUSTER_NAME}-with-iampodconfig.yaml to ${CLUSTER_CONFIG_S3_BUCKET}."
 aws s3 cp ./${EKSA_CLUSTER_NAME}-with-iampodconfig.yaml s3://${CLUSTER_CONFIG_S3_BUCKET}
 
 #allow bucket access for two hours
@@ -86,7 +85,7 @@ aws iam put-role-policy \
     --policy-document file://config-bucket-access-policy.json
 
 #download cluster config in ADMIN MACHINE and initate cluster creation
-echo -e "${Y}\nDownloading cluster config file in ADMIN MACHINE and initiating cluster creation.${NC}"
+log 'O' "\nDownloading cluster config file in ADMIN MACHINE and initiating cluster creation."
 MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
 
 #create config-bucket-access-policy.json
@@ -112,7 +111,7 @@ until [ $ssmCommandStatus == "Success" ] || [ $ssmCommandStatus == "Failed" ]; d
     sleep 3s # Waits 3 seconds
 done
 
-echo -e "${Y}\nSSM Command Ouput: ${NC}"
+log 'O' "\nSSM Command Ouput: "
 
 aws ssm list-command-invocations \
         --command-id "${ssmCommandId}" \
@@ -121,10 +120,10 @@ aws ssm list-command-invocations \
         --query "CommandInvocations[].CommandPlugins[].{Output:Output}" --output text
 
 if [ $ssmCommandStatus == "Failed" ]; then
-    echo -e "${R}Cluster creation FAILED. Check command output in Cloudwatch logs for more details.${NC}"
+    log 'R' "Cluster creation FAILED. Check command output in Cloudwatch logs for more details."
     exit 1
 else 
-    echo -e "${G}CLUSTER CREATION COMPLETE!!! Check command output in Cloudwatch logs for more details.${NC}"
+    log 'G' "CLUSTER CREATION COMPLETE!!! Check command output in Cloudwatch logs for more details."
 fi
 
 #get get public cert of EKSA cluster

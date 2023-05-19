@@ -155,5 +155,7 @@ if [ ! -z ${existingRole} ]; then
             --policy-document file://config-bucket-access-policy.json
 
         log 'G' "Updated EKSACluserConfigAccessPolicy validity in EKSAAdminMachineSSMServiceRole. You can use this policy within validity period from ${bucketStartDateLocal} and ${bucketEndDateLocal}."
+
+        rm config-bucket-access-policy.json
     fi
 fi
