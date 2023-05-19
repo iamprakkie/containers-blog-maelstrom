@@ -45,7 +45,7 @@ else
         --policy-arn arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
 
     #deleting permission policy file
-    rm eksa-admin-machine-trust-policy.json
+    rm -f eksa-admin-machine-trust-policy.json
 
     #get role and policy
     #aws iam get-role --role-name EKSAAdminMachineSSMServiceRole

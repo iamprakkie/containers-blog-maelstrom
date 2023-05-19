@@ -87,7 +87,7 @@ aws iam put-role-policy \
     --policy-name EKSACluserConfigAccessPolicy \
     --policy-document file://config-bucket-access-policy.json
 
-rm ./config-bucket-access-policy.json
+rm -f ./config-bucket-access-policy.json
 
 #create create-eksa-cluster-command.json
 sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g; s|{{EKSA_CLUSTER_REGION}}|${EKSA_CLUSTER_REGION}|g" templates/create-eksa-cluster-command-template.json > create-eksa-cluster-command.json
@@ -100,7 +100,7 @@ ssm-send-command ${MI_ADMIN_MACHINE} "create-eksa-cluster-command.json" "Downloa
 
 log 'G' "CLUSTER CREATION COMPLETE!!!"
 
-rm create-eksa-cluster-command.json
+rm -f create-eksa-cluster-command.json
 
 #get get public cert of EKSA cluster
 bash ./get-cluster-public-cert.sh

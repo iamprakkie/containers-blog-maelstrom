@@ -12,7 +12,6 @@ env_vars_check
 # to send commands through ssm
 source ./ssm-send-command.sh
 
-
 #running ssm command to get public cert of EKSA cluster and upload to config s3 bucket
 CLUSTER_CONFIG_S3_BUCKET=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/config/s3bucket --with-decryption --query Parameter.Value --output text)
 sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g; s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g" templates/get-cluster-pub-cert-command-template.json > get-cluster-pub-cert-command.json
@@ -31,7 +30,7 @@ cd amazon-eks-pod-identity-webhook
 go run ./hack/self-hosted/main.go -key ../${EKSA_CLUSTER_NAME}-sa.pub | jq '.keys += [.keys[0]] | .keys[1].kid = ""' > ../keys.json
 cd ..
 rm -fr amazon-eks-pod-identity-webhook
-rm get-cluster-pub-cert-command.json
+rm -f get-cluster-pub-cert-command.json
 
 S3_BUCKET=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/oidc/s3bucket --with-decryption --query Parameter.Value --output text)
 
@@ -40,6 +39,6 @@ log 'O' "Uploading keys.json to ${S3_BUCKET}."
 ####################aws s3 cp --acl public-read ./keys.json s3://${S3_BUCKET}/keys.json
 echo "Temporary:: Manually upload keys.json to s3 bucket ${S3_BUCKET}"
 
-rm ../${EKSA_CLUSTER_NAME}-sa.pub ../keys.json
+rm -f ../${EKSA_CLUSTER_NAME}-sa.pub ../keys.json
 
 log 'G' "PUBLIC CERT UPLOADED TO OIDC ISSUER!!!"

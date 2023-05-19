@@ -39,7 +39,7 @@ aws kms put-key-policy --region ${EKSA_CLUSTER_REGION} --policy-name default --k
 log 'G' "Created/Updated KMS Key ${EKSA_KMS_KEY_ID} with alias alias/eksa-ssm-params-key and validity from ${kmsStartDateLocal} till ${kmsEndDateLocal}."
 
 #deleting permission policy file
-rm kms-key-policy.json
+rm -f kms-key-policy.json
 
 #checking for existing ssm parameters
 vSphereSSMParamCheck=$(aws ssm describe-parameters --region ${EKSA_CLUSTER_REGION} --parameter-filters Key=Name,Option=Equals,Values=/eksa/vsphere/username,/eksa/vsphere/password --query 'length(Parameters[*].Name)')
@@ -156,6 +156,6 @@ if [ ! -z ${existingRole} ]; then
 
         log 'G' "Updated EKSACluserConfigAccessPolicy validity in EKSAAdminMachineSSMServiceRole. You can use this policy within validity period from ${bucketStartDateLocal} and ${bucketEndDateLocal}."
 
-        rm config-bucket-access-policy.json
+        rm -f config-bucket-access-policy.json
     fi
 fi

@@ -2,8 +2,9 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: awscli
+  namespace: {{NAMESPACE}}
 spec:
-  serviceAccountName: pod-identity-webhook
+  serviceAccountName: "{{SERVICEACCOUNT}}"
   containers:
   - image: amazon/aws-cli
     command:
