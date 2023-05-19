@@ -155,7 +155,7 @@ aws ssm put-parameter --region ${EKSA_CLUSTER_REGION} \
     --value ${oidcProvider} \
     --overwrite
 
-rm discovery.json
+#rm discovery.json
 
 log 'G' "\nSuccessfully completed following tasks: "
 log 'G' "\tCreated IAM Identity provider for OpenID Connect URL (issuer): ${ISSUER_HOSTPATH}."
