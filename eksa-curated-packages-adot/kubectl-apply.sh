@@ -30,7 +30,7 @@ kubectl_apply() {
     sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g; s|{{MANIFEST_FILE}}|${MANIFEST_FILE}|g" templates/kubectl-apply-manifest-command-template.json > kubectl-apply-manifest-command.json
 
     MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
-    ssm-send-command ${MI_ADMIN_MACHINE} "kubectl-apply-manifest.json" "${CMD_COMMENT}"
+    ssm-send-command ${MI_ADMIN_MACHINE} "kubectl-apply-manifest-command.json" "${CMD_COMMENT}"
 
     rm -f kubectl-apply-manifest-command.json
 
