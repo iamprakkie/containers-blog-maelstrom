@@ -84,8 +84,6 @@ else
     ####################aws s3 cp --acl public-read ./discovery.json s3://${S3_BUCKET}/.well-known/openid-configuration    
 fi
 
-#Create IAM Identity provider for OpenID Connect
-log 'O' "Creating IAM Identity provider for OpenID Connect URL: ${ISSUER_HOSTPATH}."
 
 oidcConfigHTTPStatus=$(curl -s -o /dev/null -I -w "%{http_code}" https://${ISSUER_HOSTPATH}/.well-known/openid-configuration)
 
@@ -105,6 +103,9 @@ if [ -z "${IdPThumbPrint}" ]; then
     log 'R' "Unable to get thumbprint for IdP ${ISSUER_HOSTPATH}. Cannot proceed."
     exit 1
 fi
+
+#Create IAM Identity provider for OpenID Connect
+log 'O' "Working on IAM Identity provider for OpenID Connect URL: ${ISSUER_HOSTPATH}."
 
 existingOidcProvider=$(aws iam list-open-id-connect-providers --query "OpenIDConnectProviderList[?Arn=='arn:aws:iam::${EKSA_ACCOUNT_ID}:oidc-provider/${ISSUER_HOSTPATH}'].Arn" --output text)
 if [ ! -z "${existingOidcProvider}" ]; then
