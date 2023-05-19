@@ -82,7 +82,7 @@ if [ ! -z ${existingIAMUser} ]; then
     attachedUserPolicy=$(aws iam list-user-policies --user-name EKSACuratedPackagesAccessUser --query PolicyNames --output text)
 
     if [ ${attachedPoliciesCount} == 0 ] && [ ${attachedUserPoliciesCount} == 1 ]  && [ ${attachedUserPolicy} == 'EKSACuratedPackagesAccessPolicy' ]; then
-        log 'O' "Existing IAM User with name "${existingIAMUser}" found. Will use this IAM user to create access key for read access to EKSA ECR for curated packages."
+        log 'C' "Existing IAM User with name "${existingIAMUser}" found. Will use this IAM user to create access key for read access to EKSA ECR for curated packages."
     else
         log 'R' "Existing IAM User with name "${existingIAMUser}" found with unexpected policies. Fix the policies or delete this IAM user to proceed."
         exit 1
