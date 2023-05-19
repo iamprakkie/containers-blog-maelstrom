@@ -8,8 +8,6 @@ set -e
 # checking environment variables
 source ./env-vars-check.sh
 env_vars_check
-
-
  
 # create and create ssm-user
 userCheck=$(grep -c eksa /etc/passwd)
