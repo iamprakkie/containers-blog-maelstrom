@@ -19,10 +19,10 @@ if [ ! -f ./${EKSA_CLUSTER_NAME}.yaml ]; then
 fi
 
 #configuring ssm-user and adding to docker group
-sh ./configure-ssm-user.sh
+bash ./configure-ssm-user.sh
 
 log 'O' "Creating OIDC Issuer for IRSA."
-sh ./create-oidc-issuer.sh
+bash ./create-oidc-issuer.sh
 
 existingConfigBucket=$(sudo aws ssm get-parameters --region ${EKSA_CLUSTER_REGION} --name /eksa/config/s3bucket --query Parameters[0].Name --output text)
 
@@ -103,4 +103,4 @@ log 'G' "CLUSTER CREATION COMPLETE!!!"
 rm create-eksa-cluster-command.json
 
 #get get public cert of EKSA cluster
-sh ./get-cluster-public-cert.sh
+bash ./get-cluster-public-cert.sh
