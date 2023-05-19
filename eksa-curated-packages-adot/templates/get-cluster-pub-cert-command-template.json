@@ -1,7 +1,7 @@
 {
     "Parameters": {
         "commands": [
-            "su ssm-user --shell bash -c 'set -o pipefail; export EKSA_CLUSTER_NAME={{EKSA_CLUSTER_NAME}}; export CLUSTER_CONFIG_S3_BUCKET={{CLUSTER_CONFIG_S3_BUCKET}}; export KUBECONFIG=${HOME}/${EKSA_CLUSTER_NAME}/${EKSA_CLUSTER_NAME}-eks-a-cluster.kubeconfig; echo \"values:: ${EKSA_CLUSTER_NAME}-sa.pub ${CLUSTER_CONFIG_S3_BUCKET}\"; kubectl get secret sample-cluster-sa -n eksa-system -o jsonpath={.data.tls\\\\.crt} | base64 --decode > /home/ssm-user/${EKSA_CLUSTER_NAME}-sa.pub; sudo aws s3 cp /home/ssm-user/${EKSA_CLUSTER_NAME}-sa.pub s3://${CLUSTER_CONFIG_S3_BUCKET};'"
+            "su ssm-user --shell bash -c 'set -o pipefail; export EKSA_CLUSTER_NAME={{EKSA_CLUSTER_NAME}}; export CLUSTER_CONFIG_S3_BUCKET={{CLUSTER_CONFIG_S3_BUCKET}}; export KUBECONFIG=${HOME}/${EKSA_CLUSTER_NAME}/${EKSA_CLUSTER_NAME}-eks-a-cluster.kubeconfig; kubectl get secret sample-cluster-sa -n eksa-system -o jsonpath={.data.tls\\\\.crt} | base64 --decode > /home/ssm-user/${EKSA_CLUSTER_NAME}-sa.pub; sudo aws s3 cp /home/ssm-user/${EKSA_CLUSTER_NAME}-sa.pub s3://${CLUSTER_CONFIG_S3_BUCKET};'"
         ]
     }
 }
