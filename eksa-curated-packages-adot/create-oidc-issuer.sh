@@ -26,7 +26,7 @@ else
 
     if [ ${existingBucket} != "None" ]; then
         S3_BUCKET=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/oidc/s3bucket --with-decryption --query Parameter.Value --output text)
-        log 'C' "Existing S3 bucket ${S3_BUCKET} found. Will proceed with using this bucket for OIDC issuer for IRSA."
+        log 'C' "Existing S3 bucket ${S3_BUCKET} found. Will proceed with using this bucket for OIDC issuer."
         ISSUER_HOSTPATH=${S3_BUCKET}.s3.${EKSA_CLUSTER_REGION}.amazonaws.com
 
     else
@@ -75,14 +75,13 @@ else
         ####################aws s3api put-public-access-block --region ${EKSA_CLUSTER_REGION} --bucket ${S3_BUCKET} --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=true,RestrictPublicBuckets=true"
         ####################aws s3api put-bucket-ownership-controls --region ${EKSA_CLUSTER_REGION} --bucket ${S3_BUCKET} --ownership-controls="Rules=[{ObjectOwnership=BucketOwnerPreferred}]"
 
-        #create OIDC discovery.json
-        sed -e "s|{{ISSUER_HOSTPATH}}|${ISSUER_HOSTPATH}|g" templates/oidc-discovery-template.json > discovery.json
-
-        #upload discovery.json to s3 bucket as .well-known/openid-configuration
-        ####################aws s3 cp --acl public-read ./discovery.json s3://${S3_BUCKET}/.well-known/openid-configuration
-
     fi
-    
+
+    #create OIDC discovery.json
+    sed -e "s|{{ISSUER_HOSTPATH}}|${ISSUER_HOSTPATH}|g" templates/oidc-discovery-template.json > discovery.json
+
+    #upload discovery.json to s3 bucket as .well-known/openid-configuration
+    ####################aws s3 cp --acl public-read ./discovery.json s3://${S3_BUCKET}/.well-known/openid-configuration    
 fi
 
 #Create IAM Identity provider for OpenID Connect
