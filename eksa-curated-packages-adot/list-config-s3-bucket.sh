@@ -15,8 +15,8 @@ CLUSTER_CONFIG_S3_BUCKET=$(aws ssm get-parameter --region ${EKSA_CLUSTER_REGION}
 #get admin machine instance id
 MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
 
-# preparing 
-cat > create-eksa-cluster-command.json << EOF
+# preparing ssm command file
+cat > list-config-s3-bucket-command.json << EOF
 {
     "Parameters": {
         "commands": [
@@ -26,38 +26,6 @@ cat > create-eksa-cluster-command.json << EOF
 }
 EOF
 
-exit 22
+ssm_send_command ${MI_ADMIN_MACHINE} "list-config-s3-bucket-command.json" "List contents of config s3 bucket"
 
-ssm_send_command ${MI_ADMIN_MACHINE} "create-eksa-cluster-command.json" "Download cluster config to ADMIN MACHINE and create EKSA cluster"
-
-log 'G' "CLUSTER CREATION COMPLETE!!!"
-
-rm -f create-eksa-cluster-command.json
-
-
-
-ssmCommandId=$(aws ssm send-command --region ${EKSA_CLUSTER_REGION} \
-    --instance-ids ${MI_ADMIN_MACHINE} --document-name "AWS-RunShellScript" \
-    --parameters 'commands=["kubectl exec -n test-ns awscli -- aws s3 ls $CLUSTER_CONFIG_S3_BUCKET"]' \
-    --output text --query "Command.CommandId")
-    
-sleep 3s # Waits 3 seconds
-
-aws ssm list-command-invocations --command-id ${ssmCommandId} \
-    --region ${EKSA_CLUSTER_REGION} --details \
-    --query "CommandInvocations[].CommandPlugins[].{Output:Output}" --output text
-
-if [[ $# -ne 1 ]]; then
-    log 'R' "Usage: deploy-manifest <MANIFEST FILE NAME> [COMMENT]"
-    exit 1
-fi
-
-MANIFEST_FILE=$1
-CMD_COMMENT=${2:-"Deploying manifest file ${MANIFEST_FILE}"}
-
-
-# Deploy manifest file here.
-log 'O' "Deploying manifest file..."
-kubectl_apply ${MANIFEST_FILE} "${CMD_COMMENT}"
-
-log 'G' "Deployment of manifest file ${MANIFEST_FILE} is COMPLETE!!!"
+rm -f list-config-s3-bucket-command.json
