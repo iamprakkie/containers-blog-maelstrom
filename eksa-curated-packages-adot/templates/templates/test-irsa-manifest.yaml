@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awscli
+  namespace: "test-ns"
+spec:
+  serviceAccountName: "test-ns-irsa-sa"
+  containers:
+  - image: amazon/aws-cli
+    command:
+      - sleep
+      - "infinity"
+    name: awscli
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
