@@ -27,7 +27,7 @@ kubectl_apply() {
     #upload manifest file to config bucket
     aws s3 cp "${MANIFEST_FILE}" s3://${CLUSTER_CONFIG_S3_BUCKET}
 
-    sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g; s|{{MANIFEST_FILE}}|${MANIFEST_FILE}|g" templates/kubectl-apply-manifest-command-template.json > kubectl-apply-manifest-command.json
+    sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g; s|{{MANIFEST_FILE}}|`basename ${MANIFEST_FILE}`|g" templates/kubectl-apply-manifest-command-template.json > kubectl-apply-manifest-command.json
 
     MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
     ssm_send_command ${MI_ADMIN_MACHINE} "kubectl-apply-manifest-command.json" "${CMD_COMMENT}"
