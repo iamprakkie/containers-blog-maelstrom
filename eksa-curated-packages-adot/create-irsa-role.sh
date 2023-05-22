@@ -4,7 +4,6 @@ set -e # exit when any command fails
 
 source ./format_display.sh # format display
 source ./env-vars-check.sh # checking environment variables
-source ./create-irsa-role.sh # to create IRSA role
 source ./ssm_send_command.sh # to send commands through ssm
 source ./deploy-pod-identity-webhook.sh # to deploy pod-identity-webhook
 
