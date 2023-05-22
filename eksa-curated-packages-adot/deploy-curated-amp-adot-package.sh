@@ -1,16 +1,13 @@
 #!/bin/bash
 
-source ./format_display.sh
+set -e # exit when any command fails
 
-# exit when any command fails
-set -e
+source ./format-display.sh # format display
+source ./env-vars-check.sh # checking environment variables
+source ./ssm-send-command.sh # to send commands through ssm
 
-# checking environment variables
-source ./env-vars-check.sh
+#check for required env variables
 env_vars_check
-
-# to send commands through ssm
-source ./ssm-send-command.sh
 
 #creating AMP workspace
 export EKSA_AMP_WORKSPACE_ALIAS=${EKSA_CLUSTER_NAME}-AMP-workspace

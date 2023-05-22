@@ -2,7 +2,7 @@
 
 set -e # exit when any command fails
 
-source ./format_display.sh # format display
+source ./format-display.sh # format display
 source ./env-vars-check.sh # checking environment variables
 source ./create-irsa-role.sh # to create IRSA role
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./format_display.sh
+source ./format-display.sh # format display
 
 function env_vars_check() {
     # checking environment variables
