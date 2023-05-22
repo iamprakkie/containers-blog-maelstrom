@@ -9,7 +9,7 @@ source ./create-irsa-role.sh # to create IRSA role
 #check for required env variables
 env_vars_check
 
-if [[ $# -ne 3 ]]; then
+if [[ $# -ne 2 ]]; then
     log 'R' "Usage: configure-irsa.sh <NAMESPACE> <IAM PERMISSION POLICY FILE NAME> [SERVICEACCOUNT NAME]"
     exit 1
 fi
