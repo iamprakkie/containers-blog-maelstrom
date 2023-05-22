@@ -1,19 +1,15 @@
 #!/bin/bash
 
-source ./format_display.sh
+set -e # exit when any command fails
 
-# exit when any command fails
-set -e
+source ./format_display.sh # format display
+source ./env-vars-check.sh # checking environment variables
+source ./create-irsa-role.sh # to create IRSA role
+source ./ssm_send_command.sh # to send commands through ssm
+source ./deploy-pod-identity-webhook.sh # to deploy pod-identity-webhook
 
-# checking environment variables
-source ./env-vars-check.sh
+#check for required env variables
 env_vars_check
-
-# to send commands through ssm
-source ./ssm-send-command.sh
-
-# to deploy pod-identity-webhook
-source ./deploy-pod-identity-webhook.sh
 
 create_irsa_role() {
     if [[ $# -ne 3 ]]; then
@@ -69,7 +65,7 @@ create_irsa_role() {
     MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
     
     log 'O' "Deploying sa in namespace ${NAMESPACE}."
-    ssm-send-command ${MI_ADMIN_MACHINE} "create-irsa-sa-command.json" "Deploying SA for IRSA"
+    ssm_send_command ${MI_ADMIN_MACHINE} "create-irsa-sa-command.json" "Deploying SA for IRSA"
 
     log 'G' "IRSA SETUP COMPLETE!!!"
 

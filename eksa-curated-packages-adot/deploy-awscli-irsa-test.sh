@@ -4,10 +4,10 @@ set -e # exit when any command fails
 
 source ./format_display.sh # format display
 source ./env-vars-check.sh # checking environment variables
-source ./ssm-send-command.sh # to send commands through ssm
 source ./create-irsa-role.sh # to create IRSA role
 source ./kubectl-apply.sh # to apply manifest file
 
+#check for required env variables
 env_vars_check
 
 # sample NAMESPACE and sa name

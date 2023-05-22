@@ -9,9 +9,9 @@ set -e
 source ./env-vars-check.sh
 env_vars_check
 
-ssm-send-command() {
+ssm_send_command() {
     if [[ $# -ne 3 ]]; then
-        log 'R' "Usage: ssm-send-command <MI_ADMIN_MACHINE> <COMMAND FILE NAME> <COMMENT>"
+        log 'R' "Usage: ssm_send_command <MI_ADMIN_MACHINE> <COMMAND FILE NAME> <COMMENT>"
         exit 1
     fi
 

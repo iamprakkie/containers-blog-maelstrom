@@ -1,20 +1,18 @@
 #!/bin/bash
 
-source ./format_display.sh
+set -e # exit when any command fails
 
-# exit when any command fails
-set -e
+source ./format_display.sh # format display
+source ./env-vars-check.sh # checking environment variables
+source ./create-irsa-role.sh # to create IRSA role
+source ./ssm-send-command.sh # to send commands through ssm
 
-# checking environment variables
-source ./env-vars-check.sh
+#check for required env variables
 env_vars_check
-
-# to send commands through ssm
-source ./ssm-send-command.sh
 
 deploy_pod_identity_webhook() {
     if [[ $# -ne 1 ]]; then
-        log 'R' "Usage: deploy-pod-identity-webhook <NAMESPACE>"
+        log 'R' "Usage: deploy_pod_identity_webhook <NAMESPACE>"
         exit 1
     fi
 
@@ -52,7 +50,7 @@ deploy_pod_identity_webhook() {
     # deploy pod identity webhook
     log 'O' "Deploying pod identity webhook in namespace ${NAMESPACE}."
     MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
-    ssm-send-command ${MI_ADMIN_MACHINE} "deploy-pod-identity-webhook-command.json" "Download pod identity webhook manifest files and deploy"
+    ssm_send_command ${MI_ADMIN_MACHINE} "deploy-pod-identity-webhook-command.json" "Download pod identity webhook manifest files and deploy"
 
     log 'G' "Pod identity webhook deployment in namespace ${NAMESPACE} COMPLETE!!!"
 

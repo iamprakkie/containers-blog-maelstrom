@@ -96,7 +96,7 @@ sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_C
 MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
 
 log 'O' "Downloading cluster config file in ADMIN MACHINE and initiating cluster creation."
-ssm-send-command ${MI_ADMIN_MACHINE} "create-eksa-cluster-command.json" "Download cluster config to ADMIN MACHINE and create EKSA cluster"
+ssm_send_command ${MI_ADMIN_MACHINE} "create-eksa-cluster-command.json" "Download cluster config to ADMIN MACHINE and create EKSA cluster"
 
 log 'G' "CLUSTER CREATION COMPLETE!!!"
 

@@ -18,7 +18,7 @@ sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g; s|{{CLUSTER_CONFIG_S3_BUCK
 
 log 'O' "Getting public certificate of EKSA Cluster."
 MI_ADMIN_MACHINE=$(aws ssm --region $EKSA_CLUSTER_REGION describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
-ssm-send-command ${MI_ADMIN_MACHINE} "get-cluster-pub-cert-command.json" "Get cluster public cert"
+ssm_send_command ${MI_ADMIN_MACHINE} "get-cluster-pub-cert-command.json" "Get cluster public cert"
 
 #downloading pub file from config s3 bucket
 aws s3 cp s3://${CLUSTER_CONFIG_S3_BUCKET}/${EKSA_CLUSTER_NAME}-sa.pub ./${EKSA_CLUSTER_NAME}-sa.pub
