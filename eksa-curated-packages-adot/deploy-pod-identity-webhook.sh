@@ -4,7 +4,6 @@ set -e # exit when any command fails
 
 source ./format_display.sh # format display
 source ./env-vars-check.sh # checking environment variables
-source ./create-irsa-role.sh # to create IRSA role
 source ./ssm-send-command.sh # to send commands through ssm
 
 #check for required env variables
