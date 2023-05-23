@@ -9,7 +9,7 @@ source ./kubectl-apply.sh # to apply manifest file
 #check for required env variables
 env_vars_check
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -lt 1 ]]; then
     log 'R' "Usage: deploy-manifest <MANIFEST FILE NAME> [COMMENT]"
     exit 1
 fi
