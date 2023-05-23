@@ -9,6 +9,13 @@ source ./ssm-send-command.sh # to apply manifest file
 #check for required env variables
 env_vars_check
 
+if [[ $# -ne 1 ]]; then
+    log 'R' "Usage: list-config-s3-bucket.sh <NAMESPACE>"
+    exit 1
+fi
+
+NAMESPACE=$1
+
 #get config bucket name
 CLUSTER_CONFIG_S3_BUCKET=$(aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/config/s3bucket --with-decryption --query Parameter.Value --output text)
 
@@ -20,7 +27,7 @@ cat > list-config-s3-bucket-command.json << EOF
 {
     "Parameters": {
         "commands": [
-            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/${EKSA_CLUSTER_NAME}/${EKSA_CLUSTER_NAME}-eks-a-cluster.kubeconfig; set -o pipefail; kubectl exec -n test-ns awscli -- aws s3 ls ${CLUSTER_CONFIG_S3_BUCKET}'"
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/${EKSA_CLUSTER_NAME}/${EKSA_CLUSTER_NAME}-eks-a-cluster.kubeconfig; set -o pipefail; kubectl exec -n ${NAMESPACE} awscli -- aws s3 ls ${CLUSTER_CONFIG_S3_BUCKET}'"
         ]
     }
 }
