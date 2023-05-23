@@ -23,30 +23,57 @@ EKSA_AMP_WORKSPACE_ID=$(aws amp list-workspaces --region=${EKSA_CLUSTER_REGION} 
 EKSA_AMP_WORKSPACE_ARN=$(aws amp list-workspaces --region=${EKSA_CLUSTER_REGION} --alias ${EKSA_AMP_WORKSPACE_ALIAS} --region=${EKSA_CLUSTER_REGION} --query 'workspaces[0].[arn]' --output text)
 EKSA_AMP_REMOTEWRITE_URL=$(aws amp describe-workspace --region=${EKSA_CLUSTER_REGION} --workspace-id ${EKSA_AMP_WORKSPACE_ID} --query workspace.prometheusEndpoint --output text)api/v1/remote_write
 
-NAMESPACE=${1:-observability}
-SERVICE_ACCOUNT=${2:-curated-amp-adot-sa}
+namespace=${1:-observability}
+serviceAccount=${2:-curated-amp-adot-sa}
 
-#configure IRSA
-bash ./configure-irsa.sh ${NAMESPACE} "templates/irsa-trust-policy-template.json" ${SERVICE_ACCOUNT}
+#create IAM role for IRSA 
+#checking for existing IAM Role
+existingRole=$(aws iam list-roles --query "Roles[?RoleName=='AMP-ADOT-IRSA-Role'].RoleName" --output text)
+if [ ! -z ${existingRole} ]; then
+    log 'C' "Existing IAM role with name ${existingRole} found. Will use this IAM role."
+else
+    oidcIssuer=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/oidc/issuer --with-decryption --query Parameter.Value --output text)
+    oidcProvider=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/oidc/provider --with-decryption --query Parameter.Value --output text)
 
-=====
+    #create policy files
+    sed -e "s|{{ISSUER_HOSTPATH}}|${oidcIssuer}|g; s|{{OIDCPROVIDER}}|${oidcProvider}|g; s|{{NAMESPACE}}|${namespace}|g; s|{{SERVICE_ACCOUNT}}|${serviceAccount}|g" templates/irsa-trust-policy-template.json > irsa-trust-policy.json
+
+    sed -e "s|{{EKSA_AMP_WORKSPACE_ARN}}|${EKSA_AMP_WORKSPACE_ARN}|g" templates/irsa-amp-permission-policy-template.json > irsa-amp-permission-policy.json
+
+    #create role with trust policy
+    log 'O' "Creating IAM role for AMP access to ADOT using IRSA."
+    aws iam create-role \
+        --role-name AMP-ADOT-IRSA-Role \
+        --query Role.Arn --output text \
+        --assume-role-policy-document file://irsa-trust-policy.json
+
+    #attach inline policy to allow remote write access to AMP using IRSA
+    aws iam put-role-policy \
+        --role-name AMP-ADOT-IRSA-Role \
+        --policy-name IRSA-AMP-PermissionPolicy \
+        --policy-document file://irsa-amp-permission-policy.json
+
+fi
+
+roleARN=$(aws iam list-roles --query "Roles[?RoleName=='AMP-ADOT-IRSA-Role'].Arn" --output text)
+
+
+
+#prepare curated-amp-adot-sa.yaml
+sed -e "s|{{NAMESPACE}}|${namespace}|g; s|{{SERVICEACCOUNT}}|${serviceAccount}|g; s|{{ROLEARN}}|${roleARN}|g" templates/curated-amp-adot-sa-template.yaml > curated-amp-adot-sa.yaml
+
+#upload files to config bucket
+log 'O' "Uploading curated-amp-adot-sa.yaml to ${CLUSTER_CONFIG_S3_BUCKET}."
+aws s3 cp curated-amp-adot-sa.yaml s3://${CLUSTER_CONFIG_S3_BUCKET}
 
 #prepare curated-amp-adot-package.yaml
-
-ROLEARN=$(aws iam list-roles --query "Roles[?RoleName=='${SERVICEACCOUNT}-Role'].Arn" --output text)
-
-sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g; s|{{EKSA_CLUSTER_REGION}}|$EKSA_CLUSTER_REGION|g; s|{{EKSA_AMP_REMOTEWRITE_URL}}|$EKSA_AMP_REMOTEWRITE_URL|g; s|{{NAMESPACE}}|$NAMESPACE|g; s|{{SERVICEACCOUNT}}|$SERVICE_ACCOUNT|g; s|{{ROLEARN}}|${ROLEARN}|g" templates/curated-amp-adot-package-template.yaml > curated-amp-adot-package.yaml
-
-log 'O' "Deploying curated ADOT package in namespace ${NAMESPACE}."
-bash ./deploy-manifest.sh ./curated-amp-adot-package.yaml
-
-rm -f curated-amp-adot-package.yaml
+sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g; s|{{EKSA_CLUSTER_REGION}}|$EKSA_CLUSTER_REGION|g; s|{{EKSA_AMP_REMOTEWRITE_URL}}|$EKSA_AMP_REMOTEWRITE_URL|g; s|{{NAMESPACE}}|$namespace|g; s|{{SERVICEACCOUNT}}|$serviceAccount|g; s|{{ROLEARN}}|$roleARN|g" templates/curated-amp-adot-package-template.yaml > curated-amp-adot-package.yaml
 
 #upload files to config bucket
 log 'O' "Uploading curated-amp-adot-package.yaml to ${CLUSTER_CONFIG_S3_BUCKET}."
 aws s3 cp curated-amp-adot-package.yaml s3://${CLUSTER_CONFIG_S3_BUCKET}
 
-log 'O' "Deploying curated ADOT package in NAMESPACE ${NAMESPACE}."
+log 'O' "Deploying curated ADOT package in namespace ${namespace}."
 MI_ADMIN_MACHINE=$(aws ssm --region ${EKSA_CLUSTER_REGION} describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
 
 #create deploy-curated-amp-adot-command.json

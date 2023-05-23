@@ -2,7 +2,7 @@ apiVersion: packages.eks.amazonaws.com/v1alpha1
 kind: Package
 metadata:
   name: curated-metrics-server
-  namespace: eksa-packages-{{EKSA_CLUSTER_NAME}}
+  namespace: eksa-packages
 spec:
   packageName: metrics-server
   targetNamespace: {{NAMESPACE}}
