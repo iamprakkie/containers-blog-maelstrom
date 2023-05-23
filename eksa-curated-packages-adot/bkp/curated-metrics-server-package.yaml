@@ -1,0 +1,12 @@
+apiVersion: packages.eks.amazonaws.com/v1alpha1
+kind: Package
+metadata:
+  name: curated-metrics-server
+  namespace: eksa-packages-sample-cluster
+spec:
+  packageName: metrics-server
+  targetNamespace: observability
+  config: |-
+    args:
+      - "--kubelet-insecure-tls"
+---

@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "commands": [
+            "aws s3 cp s3://eksa-cluster-config-eeqqfpkktwzxhewrsqglrrrgqmnsbpfd/curated-metrics-server-package.yaml /home/ssm-user",
+            "chown -R ssm-user:ssm-user /home/ssm-user/curated-metrics-server-package.yaml",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/sample-cluster/sample-cluster-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; eksctl anywhere delete package curated-metrics-server --cluster sample-cluster 2> /dev/null; eksctl anywhere create packages -f ./curated-metrics-server-package.yaml'"
+
+        ]
+    }
+}

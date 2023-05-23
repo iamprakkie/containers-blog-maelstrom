@@ -1,0 +1,12 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "aps:RemoteWrite"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:aps:us-east-2:505670647613:workspace/ws-7e36a423-5268-4eb3-ab3b-0ab76316bcb7"
+        }
+    ]
+}

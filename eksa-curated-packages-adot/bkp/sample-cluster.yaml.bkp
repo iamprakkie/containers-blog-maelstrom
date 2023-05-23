@@ -1,0 +1,97 @@
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: Cluster
+metadata:
+  name: sample-cluster
+spec:
+  clusterNetwork:
+    cniConfig:
+      cilium: {}
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+    services:
+      cidrBlocks:
+      - 10.96.0.0/12
+  controlPlaneConfiguration:
+    count: 2
+    endpoint:
+      host: "10.4.4.72"
+    machineGroupRef:
+      kind: VSphereMachineConfig
+      name: sample-cluster-cp
+  datacenterRef:
+    kind: VSphereDatacenterConfig
+    name: sample-cluster
+  externalEtcdConfiguration:
+    count: 3
+    machineGroupRef:
+      kind: VSphereMachineConfig
+      name: sample-cluster-etcd
+  kubernetesVersion: "1.22"
+  managementCluster:
+    name: sample-cluster
+  workerNodeGroupConfigurations:
+  - count: 2
+    machineGroupRef:
+      kind: VSphereMachineConfig
+      name: sample-cluster
+    name: md-0
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereDatacenterConfig
+metadata:
+  name: sample-cluster
+spec:
+  datacenter: "SDDC-Datacenter"
+  insecure: false
+  network: "/SDDC-Datacenter/network/eks-workload-network"
+  server: "vcenter.sddc-18-211-251-188.vmwarevmc.com"
+  thumbprint: "A7:07:A6:9D:C4:FA:62:85:80:ED:00:4C:85:F4:38:8A:D0:69:F8:36"
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereMachineConfig
+metadata:
+  name: sample-cluster-cp
+spec:
+  datastore: "/SDDC-Datacenter/datastore/WorkloadDatastore"
+  diskGiB: 25
+  folder: "/SDDC-Datacenter/vm/praksri/clusters-dir"
+  memoryMiB: 8192
+  numCPUs: 2
+  osFamily: ubuntu
+  resourcePool: "/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/AMER-LATAM-ResourcePool"
+  template: "/SDDC-Datacenter/vm/Templates/eks-a-templates/ubuntu-v1.22.6-eks-d-1-22-6-eks-a-10-amd64"
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereMachineConfig
+metadata:
+  name: sample-cluster
+spec:
+  datastore: "/SDDC-Datacenter/datastore/WorkloadDatastore"
+  diskGiB: 25
+  folder: "/SDDC-Datacenter/vm/praksri/clusters-dir"
+  memoryMiB: 8192
+  numCPUs: 2
+  osFamily: ubuntu
+  resourcePool: "/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/AMER-LATAM-ResourcePool"
+  template: "/SDDC-Datacenter/vm/Templates/eks-a-templates/ubuntu-v1.22.6-eks-d-1-22-6-eks-a-10-amd64"
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereMachineConfig
+metadata:
+  name: sample-cluster-etcd
+spec:
+  datastore: "/SDDC-Datacenter/datastore/WorkloadDatastore"
+  diskGiB: 25
+  folder: "/SDDC-Datacenter/vm/praksri/clusters-dir"
+  memoryMiB: 8192
+  numCPUs: 2
+  osFamily: ubuntu
+  resourcePool: "/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/AMER-LATAM-ResourcePool"
+  template: "/SDDC-Datacenter/vm/Templates/eks-a-templates/ubuntu-v1.22.6-eks-d-1-22-6-eks-a-10-amd64"
+
+---

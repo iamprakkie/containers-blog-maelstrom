@@ -1,0 +1,12 @@
+{
+    "Parameters": {
+        "commands": [
+            "aws s3 cp s3://eksa-cluster-config-eeqqfpkktwzxhewrsqglrrrgqmnsbpfd/amp-adot-sa.yaml /home/ssm-user",
+            "aws s3 cp s3://eksa-cluster-config-eeqqfpkktwzxhewrsqglrrrgqmnsbpfd/amp-adot-curated-packages.yaml /home/ssm-user",
+            "chown -R ssm-user:ssm-user /home/ssm-user/amp-adot-sa.yaml /home/ssm-user/amp-adot-curated-packages.yaml",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/sample-cluster/sample-cluster-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; kubectl apply -f ./amp-adot-sa.yaml'",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/sample-cluster/sample-cluster-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; eksctl anywhere delete package amp-adot --cluster sample-cluster; eksctl anywhere create packages -f ./amp-adot-curated-packages.yaml'"
+
+        ]
+    }
+}
