@@ -27,7 +27,8 @@ NAMESPACE=${1:-observability}
 SERVICE_ACCOUNT=${2:-curated-amp-adot-sa}
 
 #configure IRSA
-bash ./configure-irsa.sh ${NAMESPACE} "templates/irsa-trust-policy-template.json" ${SERVICE_ACCOUNT}
+sed -e "s|{{EKSA_AMP_WORKSPACE_ARN}}|${EKSA_AMP_WORKSPACE_ARN}|g" templates/amp-permission-policy-template.json > amp-permission-policy.json
+bash ./configure-irsa.sh ${NAMESPACE} "amp-permission-policy.json" ${SERVICE_ACCOUNT}
 
 #prepare curated-amp-adot-package.yaml
 ROLEARN=$(aws iam list-roles --query "Roles[?RoleName=='${SERVICEACCOUNT}-Role'].Arn" --output text)
@@ -38,4 +39,4 @@ sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g; s|{{EKSA_CLUSTER_REGION}}|
 log 'O' "Deploying curated ADOT package in namespace ${NAMESPACE}."
 bash ./deploy-manifest.sh "PACKAGE" ./curated-amp-adot-package.yaml
 
-rm -f curated-amp-adot-package.yaml
+rm -f amp-permission-policy.json curated-amp-adot-package.yaml
