@@ -37,6 +37,6 @@ sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g; s|{{EKSA_CLUSTER_REGION}}|
 
 # deploy package
 log 'O' "Deploying curated ADOT package in namespace ${NAMESPACE}."
-bash ./deploy-manifest.sh "PACKAGE" ./curated-amp-adot-package.yaml
+bash ./deploy-manifest.sh ./curated-amp-adot-package.yaml "PACKAGE" "Deploying curated ADOT package in namespace ${NAMESPACE}."
 
 rm -f amp-permission-policy.json curated-amp-adot-package.yaml
