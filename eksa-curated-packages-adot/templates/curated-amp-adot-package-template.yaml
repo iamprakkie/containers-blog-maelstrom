@@ -309,7 +309,6 @@ spec:
 
       exporters:
         logging:
-          verbosity: detailed
           loglevel: info
         prometheusremotewrite:
           endpoint: "{{EKSA_AMP_REMOTEWRITE_URL}}"
