@@ -4,7 +4,7 @@ set -e # exit when any command fails
 
 source ./format-display.sh # format display
 source ./env-vars-check.sh # checking environment variables
-source ./kubectl-apply.sh # to apply manifest file
+source ./kubectl-delete.sh # to apply manifest file
 
 #check for required env variables
 env_vars_check
