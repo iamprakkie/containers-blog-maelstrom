@@ -17,7 +17,6 @@ spec:
       annotations: {}
       # Specifies the serviceAccount annotated with eks.amazonaws.com/role-arn.
       name: "{{SERVICEACCOUNT}}" # name of the service account created at step Create a cluster with IRSA
-      namespace: {{NAMESPACE}}
 
     config:
       extensions:
