@@ -20,13 +20,13 @@ kubectl_delete() {
     MANIFEST_TYPE=${2:-"MANIFEST"}
     CMD_COMMENT=${3:-"Deleting ${MANIFEST_TYPE} ${MANIFEST_FILE}"}
 
-    #get config bucket name
-    CLUSTER_CONFIG_S3_BUCKET=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/config/s3bucket --with-decryption --query Parameter.Value --output text)
-
-    #upload manifest file to config bucket
-    aws s3 cp "${MANIFEST_FILE}" s3://${CLUSTER_CONFIG_S3_BUCKET}
-
     if [[ "${MANIFEST_TYPE}" == "MANIFEST" ]]; then
+        #get config bucket name
+        CLUSTER_CONFIG_S3_BUCKET=$(sudo aws ssm get-parameter --region ${EKSA_CLUSTER_REGION} --name /eksa/config/s3bucket --with-decryption --query Parameter.Value --output text)
+
+        #upload manifest file to config bucket
+        aws s3 cp "${MANIFEST_FILE}" s3://${CLUSTER_CONFIG_S3_BUCKET}
+            
         sed -e "s|{{CLUSTER_CONFIG_S3_BUCKET}}|${CLUSTER_CONFIG_S3_BUCKET}|g; s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g; s|{{MANIFEST_FILE}}|`basename ${MANIFEST_FILE}`|g" templates/kubectl-delete-manifest-command-template.json > kubernetes-run-command.json
     elif [[ "${MANIFEST_TYPE}" == "PACKAGE" ]]; then
         PACKAGE_NAME=${MANIFEST_FILE}
