@@ -20,6 +20,7 @@ spec:
 
     config:
       extensions:
+        health_check: {}
         sigv4auth:
           region: "{{EKSA_CLUSTER_REGION}}"
           service: "aps"
@@ -308,6 +309,7 @@ spec:
 
       exporters:
         logging:
+          verbosity: detailed
           loglevel: info
         prometheusremotewrite:
           endpoint: "{{EKSA_AMP_REMOTEWRITE_URL}}"
