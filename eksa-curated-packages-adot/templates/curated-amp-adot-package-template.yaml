@@ -2,7 +2,7 @@ apiVersion: packages.eks.amazonaws.com/v1alpha1
 kind: Package
 metadata:
   name: curated-amp-adot
-  namespace: eksa-packages-sample-cluster
+  namespace: eksa-packages-{{EKSA_CLUSTER_NAME}}
 spec:
   packageName: adot
   targetNamespace: {{NAMESPACE}}
@@ -17,6 +17,7 @@ spec:
       annotations: {}
       # Specifies the serviceAccount annotated with eks.amazonaws.com/role-arn.
       name: "{{SERVICEACCOUNT}}" # name of the service account created at step Create a cluster with IRSA
+      namespace: {{NAMESPACE}}
 
     config:
       extensions:
@@ -49,6 +50,7 @@ spec:
               tls_config:
                 ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                 insecure_skip_verify: false
+
             - job_name: kubernetes-nodes
               bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
               kubernetes_sd_configs:
@@ -67,6 +69,7 @@ spec:
               tls_config:
                 ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                 insecure_skip_verify: false
+
             - job_name: kubernetes-nodes-cadvisor
               bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
               kubernetes_sd_configs:
@@ -85,6 +88,7 @@ spec:
               tls_config:
                 ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                 insecure_skip_verify: false
+
             - job_name: kubernetes-service-endpoints
               kubernetes_sd_configs:
               - role: endpoints
@@ -127,6 +131,7 @@ spec:
                 source_labels:
                 - __meta_kubernetes_pod_node_name
                 target_label: kubernetes_node
+
             - job_name: kubernetes-service-endpoints-slow
               kubernetes_sd_configs:
               - role: endpoints
@@ -180,6 +185,7 @@ spec:
                 regex: pushgateway
                 source_labels:
                 - __meta_kubernetes_service_annotation_prometheus_io_probe
+
             - job_name: kubernetes-services
               kubernetes_sd_configs:
               - role: service
@@ -208,6 +214,7 @@ spec:
               - source_labels:
                 - __meta_kubernetes_service_name
                 target_label: kubernetes_name
+
             - job_name: kubernetes-pods
               kubernetes_sd_configs:
               - role: pod
@@ -250,6 +257,7 @@ spec:
                 regex: Pending|Succeeded|Failed|Completed
                 source_labels:
                 - __meta_kubernetes_pod_phase
+                
             - job_name: kubernetes-pods-slow
               scrape_interval: 5m
               scrape_timeout: 30s          

@@ -11,7 +11,7 @@ env_vars_check
 NAMESPACE=${1:-observability}
 
 #prepare curated-metrics-server-package.yaml
-sed -e "s|{{NAMESPACE}}|$NAMESPACE|g" templates/curated-metrics-server-package-template.yaml > curated-metrics-server-package.yaml
+sed -e "s|{{EKSA_CLUSTER_NAME}}|$EKSA_CLUSTER_NAME|g; s|{{NAMESPACE}}|$NAMESPACE|g" templates/curated-metrics-server-package-template.yaml > curated-metrics-server-package.yaml
 
 # deploy package
 log 'O' "Deploying curated metrics-server package in namespace ${NAMESPACE}."
