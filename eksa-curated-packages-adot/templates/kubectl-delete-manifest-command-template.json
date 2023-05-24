@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "commands": [
+            "aws s3 cp s3://{{CLUSTER_CONFIG_S3_BUCKET}}/{{MANIFEST_FILE}} /home/ssm-user",
+            "chown -R ssm-user:ssm-user /home/ssm-user/{{MANIFEST_FILE}}",
+            "su ssm-user --shell bash -c 'export KUBECONFIG=/home/ssm-user/{{EKSA_CLUSTER_NAME}}/{{EKSA_CLUSTER_NAME}}-eks-a-cluster.kubeconfig; cd /home/ssm-user; set -o pipefail; kubectl delete -f /home/ssm-user/{{MANIFEST_FILE}}'",
+            "su ssm-user --shell bash -c 'rm -f /home/ssm-user/{{MANIFEST_FILE}}'"
+        ]
+    }
+}

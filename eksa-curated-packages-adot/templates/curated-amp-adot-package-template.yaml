@@ -2,12 +2,13 @@ apiVersion: packages.eks.amazonaws.com/v1alpha1
 kind: Package
 metadata:
   name: curated-amp-adot
-  namespace: eksa-packages
+  namespace: eksa-packages-sample-cluster
 spec:
   packageName: adot
   targetNamespace: {{NAMESPACE}}
   config: |
     mode: deployment
+    replicaCount: 2
 
     serviceAccount:
       # Specifies whether a service account should be created
