@@ -36,6 +36,6 @@ log 'O' "Uploading keys.json to ${S3_BUCKET}."
 ####################aws s3 cp --acl public-read ./keys.json s3://${S3_BUCKET}/keys.json
 echo "Temporary:: Manually upload keys.json to s3 bucket ${S3_BUCKET}"
 
-rm -f ../${EKSA_CLUSTER_NAME}-sa.pub ../keys.json
+#rm -f ../${EKSA_CLUSTER_NAME}-sa.pub ../keys.json
 
 log 'G' "PUBLIC CERT UPLOADED TO OIDC ISSUER!!!"
