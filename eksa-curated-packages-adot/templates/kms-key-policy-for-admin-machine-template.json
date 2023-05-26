@@ -15,10 +15,18 @@
             "Sid": "Allow use of the key",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::{{EKSA_ACCOUNT_ID}}:role/{{IAM_ROLE_NAME}}"
+                "AWS": "arn:aws:iam::{{EKSA_ACCOUNT_ID}}:role/service-role/EKSAAdminMachineSSMServiceRole"
             },
             "Action": "kms:Decrypt",
-            "Resource": "*"
+            "Resource": "*",
+            "Condition": {
+                "DateGreaterThan": {
+                    "aws:CurrentTime": "{{KMS_START_TIME}}"
+                },
+                "DateLessThan": {
+                    "aws:CurrentTime": "{{KMS_END_TIME}}"
+                }
+            }
         }
     ]
 }

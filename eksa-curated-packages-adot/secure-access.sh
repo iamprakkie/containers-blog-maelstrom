@@ -18,7 +18,7 @@ kmsEndDateLocal=$(date -d "@${kmsEndDateEpoch}")
 kmsEndDateUTC=$(date -u -d "@${kmsEndDateEpoch}" '+%Y-%m-%dT%H:%M:%SZ')
 
 #create key policy file
-sed -e "s|{{EKSA_ACCOUNT_ID}}|${EKSA_ACCOUNT_ID}|g; s|{{KMS_START_TIME}}|${kmsStartDateUTC}|g; s|{{KMS_END_TIME}}|${kmsEndDateUTC}|g" templates/kms-key-policy-template.json > kms-key-policy.json
+sed -e "s|{{EKSA_ACCOUNT_ID}}|${EKSA_ACCOUNT_ID}|g; s|{{KMS_START_TIME}}|${kmsStartDateUTC}|g; s|{{KMS_END_TIME}}|${kmsEndDateUTC}|g" templates/kms-key-policy-for-admin-machine-template.json > kms-key-policy-for-admin-machine.json
 
 #checking for existing KMS key with same alias
 existingAlias=$(aws kms list-aliases  --region ${EKSA_CLUSTER_REGION} --query "Aliases[?AliasName=='alias/eksa-ssm-params-key'].AliasName" --output text)
@@ -32,13 +32,13 @@ else
     #aws kms describe-key --region ${EKSA_CLUSTER_REGION} --key-id alias/eksa-ssm-params-key
 fi
 
-aws kms put-key-policy --region ${EKSA_CLUSTER_REGION} --policy-name default --key-id ${EKSA_KMS_KEY_ID} --policy file://kms-key-policy.json
+aws kms put-key-policy --region ${EKSA_CLUSTER_REGION} --policy-name default --key-id ${EKSA_KMS_KEY_ID} --policy file://kms-key-policy-for-admin-machine.json
 #aws kms get-key-policy --region ${EKSA_CLUSTER_REGION} --policy-name default --key-id ${EKSA_KMS_KEY_ID} --output text
 
 log 'G' "Created/Updated KMS Key ${EKSA_KMS_KEY_ID} with alias alias/eksa-ssm-params-key and validity from ${kmsStartDateLocal} till ${kmsEndDateLocal}."
 
 #deleting permission policy file
-rm -f kms-key-policy.json
+rm -f kms-key-policy-for-admin-machine.json
 
 #checking for existing ssm parameters
 vSphereSSMParamCheck=$(aws ssm describe-parameters --region ${EKSA_CLUSTER_REGION} --parameter-filters Key=Name,Option=Equals,Values=/eksa/vsphere/username,/eksa/vsphere/password --query 'length(Parameters[*].Name)')
