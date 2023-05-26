@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awscli
+  namespace: "observability"
+spec:
+  serviceAccountName: "curated-amp-adot-sa"
+  containers:
+  - image: public.ecr.aws/q7p1n0s5/centos7:v4
+    command:
+      - sleep
+      - "infinity"
+    name: awscurl
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
