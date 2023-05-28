@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ssm:GetParameter",
+          "ssm:ListTagsForResource",
+          "ssm:DescribeParameters"
+        ],
+        "Resource": "arn:aws:ssm:{{EKSA_CLUSTER_REGION}}:{{EKSA_ACCOUNT_ID}}:parameter/eksa/eso/grafana-key"
+      }
+    ]
+}
+  

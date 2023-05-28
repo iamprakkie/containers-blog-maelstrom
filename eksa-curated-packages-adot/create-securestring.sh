@@ -8,7 +8,6 @@ source ./env-vars-check.sh # checking environment variables
 #check for required env variables
 env_vars_check
 
-
 create_securestring() {
     if [[ $# -lt 4 ]]; then
         log 'R' "Usage: create_securestring <SSM SECURESTRING NAME> <KMS KEY ALIAS> <EXISTING IAM ROLE FOR WHICH DECRYPT ACCESS IS REQUIRED> <VALUE> [UPDATE]"
@@ -68,5 +67,3 @@ create_securestring() {
     log 'G' "SSM SecureString TASK COMPLETE!!" 
 
 }
-
-create_securestring $1 $2 $3 "$4" $5

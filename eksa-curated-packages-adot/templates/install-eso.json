@@ -1,0 +1,7 @@
+{
+    "Parameters": {
+        "commands": [
+            "su ssm-user --shell bash -c 'set -o pipefail; export EKSA_CLUSTER_NAME={{EKSA_CLUSTER_NAME}}; export CLUSTER_CONFIG_S3_BUCKET={{CLUSTER_CONFIG_S3_BUCKET}}; export KUBECONFIG=${HOME}/${EKSA_CLUSTER_NAME}/${EKSA_CLUSTER_NAME}-eks-a-cluster.kubeconfig; helm repo add external-secrets https://charts.external-secrets.io; helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace;'"
+        ]
+    }
+}
