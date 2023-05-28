@@ -20,7 +20,7 @@ GRAFANA_KEY="Grafana Key"
 
 # install ESO
 log 'O' "Installing External Secrets Operator.."
-sed -e "s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_REGION}|g" templates/install-eso-template.json > install-eso.json
+sed -e "s|{{EKSA_CLUSTER_NAME}}|${EKSA_CLUSTER_NAME}|g" templates/install-eso-template.json > install-eso.json
 MI_ADMIN_MACHINE=$(aws ssm --region $EKSA_CLUSTER_REGION describe-instance-information --filters Key=tag:Environment,Values=EKSA Key=tag:MachineType,Values=Admin --query InstanceInformationList[].InstanceId --output text)
 ssm_send_command ${MI_ADMIN_MACHINE} install-eso.json "Installing External Secrets Operator"
 
