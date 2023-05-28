@@ -5,6 +5,7 @@ set -e # exit when any command fails
 source ./format-display.sh # format display
 source ./env-vars-check.sh # checking environment variables
 source ./create-securestring.sh # creates ssm securestring
+source ./ssm-send-command.sh # to send commands through ssm
 
 #check for required env variables
 env_vars_check
