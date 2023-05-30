@@ -40,7 +40,7 @@ bash ./deploy-manifest.sh ./clustersecretstore.yaml "MANIFEST" "Deploying Cluste
 #deploy ExternalSecret
 log 'O' "Deploying ExternalSecret (eksa-eso-externalsecret) in namespace ${NAMESPACE}.."
 sed -e "s|{{NAMESPACE}}|${NAMESPACE}|g"  templates/externalsecret-template.yaml > externalsecret.yaml
-bash ./deploy-manifest.sh ./ externalsecret.yaml "MANIFEST" "Deploying ExternalSecret (eksa-eso-externalsecret) in namespace ${NAMESPACE}."
+bash ./deploy-manifest.sh ./externalsecret.yaml "MANIFEST" "Deploying ExternalSecret (eksa-eso-externalsecret) in namespace ${NAMESPACE}."
 
 rm -f install-eso.json clustersecretstore.yaml  externalsecret.yaml
 
