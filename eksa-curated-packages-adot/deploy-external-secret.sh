@@ -10,13 +10,9 @@ source ./ssm-send-command.sh # to send commands through ssm
 #check for required env variables
 env_vars_check
 
-NAMESPACE=${1:-observability}
-SERVICE_ACCOUNT=${2:-external-secrets-sa}
-
-# Get Grafana Key
-GRAFANA_KEY="Grafana Key"
-# Create ExternalSecretsRole
-    # Create ExternalSecretsRolePolicy
+GRAFANA_KEY=$1
+NAMESPACE=${2:-observability}
+SERVICE_ACCOUNT=${3:-external-secrets-sa}
 
 # install ESO
 log 'O' "Installing External Secrets Operator.."
