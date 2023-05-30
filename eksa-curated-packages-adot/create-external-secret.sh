@@ -6,6 +6,7 @@ source ./format-display.sh # format display
 source ./env-vars-check.sh # checking environment variables
 source ./create-securestring.sh # creates ssm securestring
 source ./ssm-send-command.sh # to send commands through ssm
+source ./deploy-manifest.sh # deploy manifests
 
 #check for required env variables
 env_vars_check
@@ -32,4 +33,18 @@ bash ./configure-irsa.sh ${NAMESPACE} "securestring-perm-policy.json" ${SERVICE_
 # create ssm securestring
 create_securestring /eksa/eso/grafana-key alias/eso/kms-key ${SERVICE_ACCOUNT}-Role "${GRAFANA_KEY}"
 
-rm -f install-eso.json
+#deploy ClusterSecretStore
+log 'O' "Deploying ClusterSecretStore (eksa-eso-clustersecretstore) with IRSA based authentication.."
+sed -e "s|{{EKSA_CLUSTER_REGION}}|${EKSA_CLUSTER_REGION}|g; s|{{SERVICE_ACCOUNT}}|${SERVICE_ACCOUNT}|g; s|{{NAMESPACE}}|${NAMESPACE}|g" templates/clustersecretstore-template.yaml > clustersecretstore.yaml
+bash ./deploy-manifest.sh ./clustersecretstore.yaml "MANIFEST" "Deploying ClusterSecretStore (eksa-eso-clustersecretstore) with IRSA based authentication."
+
+#deploy ExternalSecret
+log 'O' "Deploying ExternalSecret (eksa-eso-externalsecret) in namespace ${NAMESPACE}.."
+sed -e "s|{{NAMESPACE}}|${NAMESPACE}|g"  templates/externalsecret-template.yaml > externalsecret.yaml
+bash ./deploy-manifest.sh ./ externalsecret.yaml "MANIFEST" "Deploying ExternalSecret (eksa-eso-externalsecret) in namespace ${NAMESPACE}."
+
+
+
+rm -f install-eso.json clustersecretstore.yaml  externalsecret.yaml
+
+log 'G' "EXTERNAL SECRET CREATION COMPLETE!! Access secret using target secret eksa-eso-secret."
