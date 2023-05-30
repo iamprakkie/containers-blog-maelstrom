@@ -30,7 +30,7 @@ sed -e "s|{{EKSA_CLUSTER_REGION}}|${EKSA_CLUSTER_REGION}|g; s|{{EKSA_ACCOUNT_ID}
 bash ./configure-irsa.sh ${NAMESPACE} "securestring-perm-policy.json" ${SERVICE_ACCOUNT}
 
 # create ssm securestring
-create_securestring /eksa/eso/grafana-key alias/eso/kms-key ${SERVICE_ACCOUNT}-Role "${GRAFANA_KEY}"
+create_securestring /eksa/eso/grafana-key alias/eso/kms-key ${SERVICE_ACCOUNT}-Role "${GRAFANA_KEY}" UPDATE
 
 #deploy ClusterSecretStore
 log 'O' "Deploying ClusterSecretStore (eksa-eso-clustersecretstore) with IRSA based authentication.."
@@ -41,8 +41,6 @@ bash ./deploy-manifest.sh ./clustersecretstore.yaml "MANIFEST" "Deploying Cluste
 log 'O' "Deploying ExternalSecret (eksa-eso-externalsecret) in namespace ${NAMESPACE}.."
 sed -e "s|{{NAMESPACE}}|${NAMESPACE}|g"  templates/externalsecret-template.yaml > externalsecret.yaml
 bash ./deploy-manifest.sh ./ externalsecret.yaml "MANIFEST" "Deploying ExternalSecret (eksa-eso-externalsecret) in namespace ${NAMESPACE}."
-
-
 
 rm -f install-eso.json clustersecretstore.yaml  externalsecret.yaml
 
