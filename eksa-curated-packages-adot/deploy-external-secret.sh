@@ -44,4 +44,4 @@ bash ./deploy-manifest.sh ./externalsecret.yaml "MANIFEST" "Deploying ExternalSe
 
 rm -f install-eso.json clustersecretstore.yaml  externalsecret.yaml
 
-log 'G' "EXTERNAL SECRET CREATION COMPLETE!! Access secret using target secret eksa-eso-secret."
+log 'G' "EXTERNAL SECRET CREATION COMPLETE!! Access secret using target secret eksa-eso-secret in namespace ${NAMESPACE}."
