@@ -8,7 +8,7 @@
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
-                "StringLike": {
+                "StringEquals": {
                  "{{ISSUER_HOSTPATH}}:sub": ["system:serviceaccount:{{NAMESPACE}}:{{SERVICE_ACCOUNT}}"]
                 }
                }

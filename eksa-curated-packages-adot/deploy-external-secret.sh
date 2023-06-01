@@ -10,6 +10,11 @@ source ./ssm-send-command.sh # to send commands through ssm
 #check for required env variables
 env_vars_check
 
+if [[ $# -lt 1 ]]; then
+    log 'R' "Usage: deploy-external-secret.sh <AMG API KEY>"
+    exit 1
+fi
+
 GRAFANA_KEY=$1
 NAMESPACE=${2:-observability}
 SERVICE_ACCOUNT=${3:-external-secrets-sa}
