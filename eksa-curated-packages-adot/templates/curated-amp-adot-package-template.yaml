@@ -2,7 +2,7 @@ apiVersion: packages.eks.amazonaws.com/v1alpha1
 kind: Package
 metadata:
   name: curated-amp-adot
-  namespace: eksa-packages
+  namespace: eksa-packages-{{EKSA_CLUSTER_NAME}}
 spec:
   packageName: adot
   targetNamespace: {{NAMESPACE}}
